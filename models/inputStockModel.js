@@ -11,7 +11,7 @@ const inputStockSchema = mongoose.Schema({
     required: true
   },
   date: {
-    type: String
+    type: Date
   },
   notes: {
     type: String
