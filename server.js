@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const adminRoutes = require("./routes/adminRoutes")
 const variationRoutes = require("./routes/variationRoutes")
 const productRoutes = require("./routes/productRoutes")
+const wishlistRoutes = require("./routes/wishlistRoutes")
 const userRoutes = require("./routes/userRoutes")
 const upload = require("./routes/upload")
 
@@ -23,6 +24,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/variation", variationRoutes);
 app.use("/api/upload", upload);
 app.use("/api/product", productRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/user", userRoutes);
 
 
