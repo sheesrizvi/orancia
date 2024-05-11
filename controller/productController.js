@@ -20,7 +20,6 @@ const s3 = new S3Client(config);
 
 // Ecom Products
 const createProduct = asyncHandler(async (req, res) => {
-  
   const {
     groupId,
     sku,
@@ -143,7 +142,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
     });
     const response = await s3.send(command);
   });
-await Inventory.deleteOne({product:req.query.id })
+  await Inventory.deleteOne({ product: req.query.id });
   await Product.deleteOne({ _id: req.query.id });
   res.json("deleted");
 });
@@ -165,7 +164,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     size,
     subcategory,
     specialcategory,
-   
+
     rating: ratings,
   };
   const asArray = Object.entries(filter);
@@ -254,7 +253,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
 // });
 const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.query.productId).populate(
-    "category subcategory specialcatgory size"
+    "category subcategory specialcategory size"
   );
   if (product) {
     res.json(product);
@@ -265,7 +264,7 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 const getProductByGroupId = asyncHandler(async (req, res) => {
   const products = await Product.find({ groupId: req.query.groupId }).populate(
-    "category subcategory specialcatgory size"
+    "category subcategory specialcategory size"
   );
   if (products) {
     res.json(products);
@@ -339,5 +338,5 @@ module.exports = {
   createProductReview,
   getProductById,
   searchProducts,
-  getProductByGroupId
+  getProductByGroupId,
 };
