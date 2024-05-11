@@ -194,7 +194,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     .limit(pageSize)
     .sort({ createdAt: -1 })
     .skip(pageSize * (page - 1))
-    .populate("category subcategory specialcategory size");
+    .populate("category subcategory specialcategory size countInStock");
 
   res.json({ products, pageCount });
 });
@@ -253,7 +253,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
 // });
 const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.query.productId).populate(
-    "category subcategory specialcategory size"
+    "category subcategory specialcategory size countInStock"
   );
   if (product) {
     res.json(product);
@@ -264,7 +264,7 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 const getProductByGroupId = asyncHandler(async (req, res) => {
   const products = await Product.find({ groupId: req.query.groupId }).populate(
-    "category subcategory specialcategory size"
+    "category subcategory specialcategory size countInStock"
   );
   if (products) {
     res.json(products);
