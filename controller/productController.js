@@ -20,7 +20,6 @@ const s3 = new S3Client(config);
 
 // Ecom Products
 const createProduct = asyncHandler(async (req, res) => {
-  
   const {
     groupId,
     sku,
@@ -143,7 +142,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
     });
     const response = await s3.send(command);
   });
-await Inventory.deleteOne({product:req.query.id })
+  await Inventory.deleteOne({ product: req.query.id });
   await Product.deleteOne({ _id: req.query.id });
   res.json("deleted");
 });
@@ -165,7 +164,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     size,
     subcategory,
     specialcategory,
-   
+
     rating: ratings,
   };
   const asArray = Object.entries(filter);
@@ -264,7 +263,7 @@ const getProductById = asyncHandler(async (req, res) => {
   }
 });
 const getProductInventory = asyncHandler(async (req, res) => {
-  const product = await Product.find({}).select('_id name countInStock');
+  const product = await Product.find({}).select("_id name countInStock");
   if (product) {
     res.json(product);
   } else {
@@ -349,5 +348,5 @@ module.exports = {
   getProductById,
   searchProducts,
   getProductByGroupId,
-  getProductInventory
+  getProductInventory,
 };
