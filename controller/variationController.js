@@ -79,6 +79,15 @@ const getAllCategory = asyncHandler(async (req, res) => {
   res.json(categories);
 });
 
+const getSubCategoryByCategory = asyncHandler(async (req, res) => {
+  const catId = req.query.catId;
+
+  const subcategory = await SubCategory.find({ category: catId });
+
+
+  res.json(subcategory);
+});
+
 //Sub category
 
 const createSubCategory = asyncHandler(async (req, res) => {
@@ -296,4 +305,5 @@ module.exports = {
   createSize,
   getAllSize,
   deleteSize,
+  getSubCategoryByCategory
 };

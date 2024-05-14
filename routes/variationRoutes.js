@@ -1,6 +1,6 @@
 const express = require("express");
 const { admin } = require("../middleware/authmiddleware");
-const { createCategory, getAllCategory, createSubCategory, getAllSubCategory, createSpecialCategory, getAllSpecialCategory, createBanner, getBanner, createSize, getAllSize, deleteCategory, deleteSubCategory, deleteSpecialCategory, deleteBanner, deleteSize } = require("../controller/variationController");
+const { createCategory, getAllCategory, createSubCategory, getAllSubCategory, createSpecialCategory, getAllSpecialCategory, createBanner, getBanner, createSize, getAllSize, deleteCategory, deleteSubCategory, deleteSpecialCategory, deleteBanner, deleteSize, getSubCategoryByCategory } = require("../controller/variationController");
 const { createCoupon, getCoupon, getCouponById, deleteCoupon } = require("../controller/couponController");
 const router = express.Router();
 
@@ -8,6 +8,7 @@ router.route("/category/create").post(createCategory);
 router.route("/category/get").get(getAllCategory);
 router.route("/subcategory/create").post(createSubCategory);
 router.route("/subcategory/get").get(getAllSubCategory);
+router.route("/subcategory/get-by-category").get(getSubCategoryByCategory);
 router.route("/specialcategory/create").post(createSpecialCategory);
 router.route("/specialcategory/get").get(getAllSpecialCategory);
 router.route("/banner/create").post(createBanner);
