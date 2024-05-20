@@ -12,11 +12,13 @@ const s3 = new AWS.S3({
 });
 
 const createBlog = asyncHandler(async (req, res) => {
-  const {  heading, content, user, image, mdesc, mtitle } = req.body;
-const slug =   heading.toLowerCase()
-  .replace(/ /g, "-")
-  .replace(/[^\w-]+/g, "")
+  const { heading, content, user, image, mdesc, mtitle } = req.body;
+  const slug = heading
+    .toLowerCase()
+    .replace(/ /g, "-")
+    .replace(/[^\w-]+/g, "");
   const blog = await Blog.create({
+    _id: slug,
     slug,
     heading,
     content,
@@ -75,7 +77,7 @@ const getBlogs = asyncHandler(async (req, res) => {
 
 const deleteBlog = asyncHandler(async (req, res) => {
   const BlogId = req.query.blogId;
-
+  console.log("first");
   const blog = await Blog.findById(BlogId);
 
   if (blog) {
