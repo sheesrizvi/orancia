@@ -61,7 +61,7 @@ router.delete("/deleteImage", admin, async (req, res) => {
         Key: fileName,
       });
       const response = await s3.send(command);
-      console.log(response)
+   
   });
 });
 

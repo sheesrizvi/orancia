@@ -7,7 +7,7 @@ const productRoutes = require("./routes/productRoutes")
 const wishlistRoutes = require("./routes/wishlistRoutes")
 const userRoutes = require("./routes/userRoutes")
 const upload = require("./routes/upload")
-
+const blogRoutes = require("./routes/blogRoutes");
 
 const cors = require("cors");
 
@@ -23,6 +23,7 @@ app.use(express.json());
 app.use("/api/admin", adminRoutes);
 app.use("/api/variation", variationRoutes);
 app.use("/api/upload", upload);
+app.use("/api/blog", blogRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/user", userRoutes);
