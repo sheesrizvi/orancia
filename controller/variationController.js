@@ -275,13 +275,12 @@ const deleteBanner = asyncHandler(async (req, res) => {
   const sub = await Banner.findById(subid);
 
   const f1 = sub.image;
-
-  const command = new DeleteObjectsCommand({
+  const fileName = f1.split("//")[1].split("/")[1];
+  const command = new DeleteObjectCommand({
     Bucket: process.env.AWS_BUCKET,
-    Delete: { Objects: f1 },
+    Key: fileName,
   });
   const response = await s3.send(command);
-
   await Banner.deleteOne({ _id: req.query.id });
   res.json("deleted");
 });
