@@ -267,4 +267,5 @@ module.exports = {
   getUserById,
   updateUser,
   resetPassword,
+  saveShippingAddress,
 };

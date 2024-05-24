@@ -17,6 +17,7 @@ const createBlog = asyncHandler(async (req, res) => {
     .toLowerCase()
     .replace(/ /g, "-")
     .replace(/[^\w-]+/g, "");
+
   const blog = await Blog.create({
     _id: slug,
     slug,

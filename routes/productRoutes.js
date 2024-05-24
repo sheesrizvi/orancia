@@ -8,6 +8,8 @@ const {
   getProductById,
   getProductByGroupId,
   getProductInventory,
+  createProductReview,
+  searchProducts,
 } = require("../controller/productController");
 const {
   createInput,

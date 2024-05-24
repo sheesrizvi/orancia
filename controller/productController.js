@@ -157,6 +157,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     min,
     max,
   } = req.query;
+  console.log(min, max, "min");
   const minprice = price ? min : 0;
   const maxprice = price ? max : 250000000;
   const filter = {
@@ -319,6 +320,7 @@ const createProductReview = asyncHandler(async (req, res) => {
   }
 });
 const searchProducts = asyncHandler(async (req, res) => {
+  console.log(req.query.Query, "v");
   const products = await Product.aggregate([
     {
       $search: {

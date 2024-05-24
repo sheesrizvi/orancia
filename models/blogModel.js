@@ -17,7 +17,7 @@ const blogSchema = mongoose.Schema(
       },
     ],
     slug: {
-        type: String,
+      type: String,
     },
     content: {
       type: {},
@@ -28,7 +28,7 @@ const blogSchema = mongoose.Schema(
     },
     mdesc: {
       type: String,
-    },   
+    },
     user: {
       type: String,
     },

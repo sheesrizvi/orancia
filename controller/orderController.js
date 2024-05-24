@@ -52,7 +52,6 @@ const sendEmail = (orderItems, paymentMethod, totalPrice, user) => {
 };
 
 const addOrderItems = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.body.userId);
   const {
     orderItems,
     shippingAddress,
@@ -134,12 +133,12 @@ const addOrderItems = asyncHandler(async (req, res) => {
         }
       }
       // reward algo
-    //   const reward = await UserReward.findOne({ user: userId });
+      //   const reward = await UserReward.findOne({ user: userId });
 
-    //   reward.amount = itemsPrice * 0.01;
+      //   reward.amount = itemsPrice * 0.01;
 
-    //   await reward.save();
-    //   sendEmail(orderItems, paymentMethod, totalPrice, user);
+      //   await reward.save();
+      //   sendEmail(orderItems, paymentMethod, totalPrice, user);
       res.status(201).json(order);
     }
   }
@@ -438,7 +437,7 @@ const getOrderFilter = asyncHandler(async (req, res) => {
 // });
 
 module.exports = {
-//   payment,
+  //   payment,
   getOrderFilter,
   getPendingOrders,
   getMonthlySales,
