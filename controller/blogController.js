@@ -77,7 +77,7 @@ const getBlogs = asyncHandler(async (req, res) => {
 
 const deleteBlog = asyncHandler(async (req, res) => {
   const BlogId = req.query.blogId;
-  console.log("first");
+
   const blog = await Blog.findById(BlogId);
 
   if (blog) {
