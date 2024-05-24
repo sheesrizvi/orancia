@@ -29,7 +29,7 @@ const userSchema = mongoose.Schema(
       mobileNumber: { type: Number },
       email: { type: String },
     },
-    
+
     pushToken: {
       type: String,
     },
