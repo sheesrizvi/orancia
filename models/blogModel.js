@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const blogSchema = mongoose.Schema(
   {
-  
+    _id: String,
     heading: {
       type: String,
       trim: true,
@@ -17,7 +17,7 @@ const blogSchema = mongoose.Schema(
       },
     ],
     slug: {
-        type: String,
+      type: String,
     },
     content: {
       type: {},
@@ -28,7 +28,7 @@ const blogSchema = mongoose.Schema(
     },
     mdesc: {
       type: String,
-    },   
+    },
     user: {
       type: String,
     },

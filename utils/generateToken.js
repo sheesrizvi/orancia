@@ -5,10 +5,14 @@ const generateTokenAdmin = (id, name, email, userType) => {
     expiresIn: "1d",
   });
 };
-const generateTokenUser = (id, name, email) => {
-  return jwt.sign({ id, name, email }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
-  });
+const generateTokenUser = (id, name, email, shippingAddress) => {
+  return jwt.sign(
+    { id, name, email, shippingAddress },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1d",
+    }
+  );
 };
 const generateTokenFinance = (id, name, email, userType) => {
   return jwt.sign(

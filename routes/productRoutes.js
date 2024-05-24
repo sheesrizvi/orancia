@@ -9,6 +9,7 @@ const {
   getProductByGroupId,
   getProductInventory,
   createProductReview,
+  searchProducts,
 } = require("../controller/productController");
 const {
   createInput,
@@ -24,6 +25,7 @@ router.route("/inventory").get(getProductInventory);
 router.route("/create-input").post(createInput);
 router.route("/getall-input").get(getAllInput);
 router.route("/create-review").post(createProductReview);
+router.route("/search-product").get(searchProducts);
 
 // delete
 router.route("/delete").delete(deleteProduct);

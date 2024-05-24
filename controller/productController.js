@@ -320,6 +320,7 @@ const createProductReview = asyncHandler(async (req, res) => {
   }
 });
 const searchProducts = asyncHandler(async (req, res) => {
+  console.log(req.query.Query, "v");
   const products = await Product.aggregate([
     {
       $search: {
