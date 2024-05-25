@@ -24,6 +24,8 @@ router.route("/get-by-groupid").get(getProductByGroupId);
 router.route("/inventory").get(getProductInventory);
 router.route("/create-input").post(createInput);
 router.route("/getall-input").get(getAllInput);
+router.route("/create-review").post(createProductReview);
+router.route("/search-product").get(searchProducts);
 
 // delete
 router.route("/delete").delete(deleteProduct);
