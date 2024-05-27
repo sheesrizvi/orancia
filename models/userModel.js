@@ -28,6 +28,8 @@ const userSchema = mongoose.Schema(
       landmark: { type: String },
       mobileNumber: { type: Number },
       email: { type: String },
+      area: { type: String },
+      state: { type: String },
     },
 
     pushToken: {

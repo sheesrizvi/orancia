@@ -25,6 +25,8 @@ const orderSchema = mongoose.Schema(
       area: { type: String, required: true },
       mobileNumber: { type: Number, required: true },
       email: { type: String, required: true },
+      area: { type: String },
+      state: { type: String },
     },
     emailDelivery: {
       type: String,
