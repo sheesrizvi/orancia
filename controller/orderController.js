@@ -4,16 +4,16 @@ const Product = require("../models/productModel");
 const User = require("../models/userModel");
 // const UserReward = require("../models/userReward");
 const nodemailer = require("nodemailer");
-const emailTemplate = require("../document/email");
-const endOfDay = require("date-fns/endOfDay");
-const startOfDay = require("date-fns/startOfDay");
-const startOfMonth = require("date-fns/startOfMonth");
-const endOfMonth = require("date-fns/endOfMonth");
-const pdf = require("html-pdf");
-const template = require("../document/template");
-const { parseISO } = require("date-fns");
-const OrderPDF = require("./orderPdf");
-const Razorpay = require("razorpay");
+// const emailTemplate = require("../document/email");
+// const endOfDay = require("date-fns/endOfDay");
+// const startOfDay = require("date-fns/startOfDay");
+// const startOfMonth = require("date-fns/startOfMonth");
+// const endOfMonth = require("date-fns/endOfMonth");
+// const pdf = require("html-pdf");
+// const template = require("../document/template");
+// const { parseISO } = require("date-fns");
+// const OrderPDF = require("./orderPdf");
+// const Razorpay = require("razorpay");
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -27,29 +27,29 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmail = (orderItems, paymentMethod, totalPrice, user) => {
-  const items = orderItems;
-  var options = { format: "A4" };
+// const sendEmail = (orderItems, paymentMethod, totalPrice, user) => {
+//   const items = orderItems;
+//   var options = { format: "A4" };
 
-  pdf
-    .create(OrderPDF({ items, user, paymentMethod, totalPrice }), options)
-    .toFile(`${__dirname}/invoice1.pdf`, (err) => {
-      transporter.sendMail({
-        from: ` Oransia <info@oransia.com>`, // sender address
-        to: `${user.email}`, // list of receivers
-        replyTo: `<info@oransia.com>`,
-        subject: `Order Confirm ${user?.name}`, // Subject line
-        text: `Order from Oransia`, // plain text body
-        html: emailTemplate(orderItems, paymentMethod, totalPrice), // html body
-        attachments: [
-          {
-            filename: "invoice1.pdf",
-            path: `${__dirname}/invoice1.pdf`,
-          },
-        ],
-      });
-    });
-};
+//   pdf
+//     .create(OrderPDF({ items, user, paymentMethod, totalPrice }), options)
+//     .toFile(`${__dirname}/invoice1.pdf`, (err) => {
+//       transporter.sendMail({
+//         from: ` Oransia <info@oransia.com>`, // sender address
+//         to: `${user.email}`, // list of receivers
+//         replyTo: `<info@oransia.com>`,
+//         subject: `Order Confirm ${user?.name}`, // Subject line
+//         text: `Order from Oransia`, // plain text body
+//         html: emailTemplate(orderItems, paymentMethod, totalPrice), // html body
+//         attachments: [
+//           {
+//             filename: "invoice1.pdf",
+//             path: `${__dirname}/invoice1.pdf`,
+//           },
+//         ],
+//       });
+//     });
+// };
 
 const addOrderItems = asyncHandler(async (req, res) => {
   const {
@@ -65,10 +65,9 @@ const addOrderItems = asyncHandler(async (req, res) => {
     deliveryStatus,
     userId,
     notes,
-    deliveryAt,
     isPaid,
   } = req.body;
-
+  console.log(req.body);
   if (paymentMethod == "COD") {
     const order = await Order.create({
       orderItems,
@@ -83,7 +82,6 @@ const addOrderItems = asyncHandler(async (req, res) => {
       notes,
       invoiceId,
       shippingPrice,
-      deliveryAt,
       paidAt,
     });
     if (order) {
@@ -94,13 +92,6 @@ const addOrderItems = asyncHandler(async (req, res) => {
           await product.save();
         }
       }
-
-      // reward algo
-      //   const reward = await UserReward.findOne({ user: userId });
-
-      //   const a = itemsPrice * 0.01;
-      //   reward.amount = a;
-      //   await reward.save();
 
       //   sendEmail(orderItems, paymentMethod, totalPrice, user);
       res.status(201).json(order);
@@ -132,12 +123,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
           await product.save();
         }
       }
-      // reward algo
-      //   const reward = await UserReward.findOne({ user: userId });
 
-      //   reward.amount = itemsPrice * 0.01;
-
-      //   await reward.save();
       //   sendEmail(orderItems, paymentMethod, totalPrice, user);
       res.status(201).json(order);
     }

@@ -11,6 +11,7 @@ const orderSchema = mongoose.Schema(
       {
         name: { type: String, required: true },
         qty: { type: Number, required: true, default: 1 },
+        image: { type: String, required: true },
         price: { type: Number, required: true },
         product: {
           type: mongoose.Schema.Types.String,
@@ -20,7 +21,7 @@ const orderSchema = mongoose.Schema(
     ],
     shippingAddress: {
       address: { type: String, required: true },
-      city: { type: String, required: true },
+      city: { type: String },
       landmark: { type: String, required: true },
       area: { type: String, required: true },
       mobileNumber: { type: Number, required: true },
