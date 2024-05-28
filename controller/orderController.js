@@ -4,6 +4,7 @@ const Product = require("../models/productModel");
 const User = require("../models/userModel");
 // const UserReward = require("../models/userReward");
 const nodemailer = require("nodemailer");
+const Inventory = require("../models/inventoryModel");
 // const emailTemplate = require("../document/email");
 // const endOfDay = require("date-fns/endOfDay");
 // const startOfDay = require("date-fns/startOfDay");
@@ -67,7 +68,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
     notes,
     isPaid,
   } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   if (paymentMethod == "COD") {
     const order = await Order.create({
       orderItems,
@@ -86,10 +87,13 @@ const addOrderItems = asyncHandler(async (req, res) => {
     });
     if (order) {
       for (let i = 0; i < orderItems.length; i++) {
-        const product = await Product.findById(orderItems[i].product);
+        const product = await Inventory.findOne({
+          product: orderItems[i].product,
+        });
+
         if (product) {
-          product.countInStock = product.countInStock - orderItems[i].qty;
-          await product.save();
+          product.qty = product.qty - orderItems[i].qty;
+          const updatedProduct = await product.save();
         }
       }
 
@@ -117,10 +121,13 @@ const addOrderItems = asyncHandler(async (req, res) => {
       // count in stock algo
 
       for (let i = 0; i < orderItems.length; i++) {
-        const product = await Product.findById(orderItems[i].product);
+        const product = await Inventory.findOne({
+          product: orderItems[i].product,
+        });
+
         if (product) {
-          product.countInStock = product.countInStock - orderItems[i].qty;
-          await product.save();
+          product.qty = product.qty - orderItems[i].qty;
+          const updatedProduct = await product.save();
         }
       }
 

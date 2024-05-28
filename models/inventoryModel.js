@@ -8,9 +8,8 @@ const inventorySchema = mongoose.Schema({
   },
   qty: {
     type: Number,
-    required: true
+    required: true,
   },
-  
 });
 
 const Inventory = mongoose.model("Inventory", inventorySchema);
