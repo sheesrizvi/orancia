@@ -68,7 +68,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
     notes,
     isPaid,
   } = req.body;
-  // console.log(req.body);
+
   if (paymentMethod == "COD") {
     const order = await Order.create({
       orderItems,

@@ -153,7 +153,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     }
 
     const updatedUser = await user.save();
-    // console.log(updatedUser);
+
     res.status(201).json({
       _id: updatedUser._id,
       name: updatedUser.name,
@@ -232,7 +232,6 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const saveShippingAddress = asyncHandler(async (req, res) => {
-  console.log(req.body, "re");
   const user = await User.findById(req.body.userId);
 
   if (user) {

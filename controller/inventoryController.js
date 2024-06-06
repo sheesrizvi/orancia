@@ -3,7 +3,6 @@ const InputStock = require("../models/inputStockModel");
 const Inventory = require("../models/inventoryModel");
 
 const createInput = asyncHandler(async (req, res) => {
-  console.log("first")
   const { inventory, qty, notes } = req.body;
   const date = new Date();
   const inputStock = await InputStock.create({ inventory, qty, date, notes });
@@ -23,24 +22,24 @@ const getStocksByProduct = asyncHandler(async (req, res) => {
   const { product } = req.query;
   const inventory = await Inventory.findOne({ product: product });
   const inputStock = await InputStock.find({ inventory: inventory._id });
-  
+
   if (inputStock) {
-    res.status(201).json({inputStock, inventory});
+    res.status(201).json({ inputStock, inventory });
   } else {
     res.status(404);
     throw new Error("Error");
   }
 });
 const getAllInput = asyncHandler(async (req, res) => {
-
   const inputStock = await InputStock.find({}).populate({
     path: "inventory",
     populate: [
       {
-      path: "product",   
-    }]
+        path: "product",
+      },
+    ],
   });
-  
+
   if (inputStock) {
     res.status(201).json(inputStock);
   } else {

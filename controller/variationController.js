@@ -22,10 +22,11 @@ const s3 = new S3Client(config);
 
 // Ecom Category
 const createCategory = asyncHandler(async (req, res) => {
-  const {  name, banner, image } = req.body;
-const id =  name.toLowerCase()
-.replace(/ /g, "-")
-.replace(/[^\w-]+/g, "")
+  const { name, banner, image } = req.body;
+  const id = name
+    .toLowerCase()
+    .replace(/ /g, "-")
+    .replace(/[^\w-]+/g, "");
   const ecomCategory = Category.create({
     _id: id,
     name,
@@ -84,7 +85,6 @@ const getSubCategoryByCategory = asyncHandler(async (req, res) => {
 
   const subcategory = await SubCategory.find({ category: catId });
 
-
   res.json(subcategory);
 });
 
@@ -92,9 +92,10 @@ const getSubCategoryByCategory = asyncHandler(async (req, res) => {
 
 const createSubCategory = asyncHandler(async (req, res) => {
   const { name, category, image } = req.body;
-  const id =  name.toLowerCase()
-  .replace(/ /g, "-")
-  .replace(/[^\w-]+/g, "")
+  const id = name
+    .toLowerCase()
+    .replace(/ /g, "-")
+    .replace(/[^\w-]+/g, "");
   const ecomCategory = SubCategory.create({
     _id: id,
     name,
@@ -152,11 +153,12 @@ const getAllSubCategory = asyncHandler(async (req, res) => {
 
 const createSpecialCategory = asyncHandler(async (req, res) => {
   const { name, subcategory, image } = req.body;
-  const id =  name.toLowerCase()
-.replace(/ /g, "-")
-.replace(/[^\w-]+/g, "")
+  const id = name
+    .toLowerCase()
+    .replace(/ /g, "-")
+    .replace(/[^\w-]+/g, "");
   const sub = await SubCategory.findById(subcategory);
-console.log(sub)
+
   const ecomCategory = SpecialCategory.create({
     _id: id,
     name,
@@ -244,7 +246,7 @@ const getAllSize = asyncHandler(async (req, res) => {
 //homebanner
 
 const createBanner = asyncHandler(async (req, res) => {
-  const { image, product,category, subcategory, SpecialCategory } = req.body;
+  const { image, product, category, subcategory, SpecialCategory } = req.body;
   const banner = Banner.create({
     image,
     category,
@@ -304,5 +306,5 @@ module.exports = {
   createSize,
   getAllSize,
   deleteSize,
-  getSubCategoryByCategory
+  getSubCategoryByCategory,
 };

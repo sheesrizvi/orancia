@@ -10,7 +10,6 @@ const createCoupon = asyncHandler(async (req, res) => {
   res.json(coupon);
 });
 
-
 const getCouponById = asyncHandler(async (req, res) => {
   const coupon = await Coupon.findById(req.query.couponId);
 
@@ -34,7 +33,7 @@ const couponUsed = asyncHandler(async (req, res) => {
     arr = coupon.usedBy;
     arr.push(userId);
     coupon.usedBy = arr;
-   
+
     const updatedCoupon = await coupon.save();
     res.json(updatedCoupon);
   } else {
@@ -49,5 +48,4 @@ module.exports = {
   getCoupon,
   deleteCoupon,
   couponUsed,
-
 };

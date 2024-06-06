@@ -104,7 +104,7 @@ const deleteBlog = asyncHandler(async (req, res) => {
 
 const getBlogById = asyncHandler(async (req, res) => {
   const blog = await Blog.findById(req.params.id);
-  console.log(req);
+
   if (blog) {
     res.json(blog);
   } else {
