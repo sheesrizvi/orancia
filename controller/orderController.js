@@ -14,7 +14,7 @@ const Inventory = require("../models/inventoryModel");
 // const template = require("../document/template");
 // const { parseISO } = require("date-fns");
 // const OrderPDF = require("./orderPdf");
-// const Razorpay = require("razorpay");
+const Razorpay = require("razorpay");
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -404,32 +404,32 @@ const getOrderFilter = asyncHandler(async (req, res) => {
   }
 });
 
-// const payment = asyncHandler(async (req, res) => {
-//   const userdtls = JSON.parse(req.query.user);
-//   const total = JSON.parse(req.query.total);
+const payment = asyncHandler(async (req, res) => {
+  const userdtls = JSON.parse(req.query.user);
+  const total = JSON.parse(req.query.total);
 
-//   const user = await User.findById(userdtls.id);
+  const user = await User.findById(userdtls.id);
 
-//   const instance = new Razorpay({
-//     key_id: process.env.RAZOR_PAY_ID,
-//     key_secret: process.env.RAZOR_PAY_SECRET,
-//   });
+  const instance = new Razorpay({
+    key_id: process.env.RAZOR_PAY_ID,
+    key_secret: process.env.RAZOR_PAY_SECRET,
+  });
 
-//   const result = await instance.orders.create({
-//     amount: total * 100,
-//     currency: "INR",
-//     receipt: "receipt#1",
-//     notes: {
-//       userId: user._id,
-//       key: process.env.RAZOR_PAY_ID,
-//     },
-//   });
+  const result = await instance.orders.create({
+    amount: total * 100,
+    currency: "INR",
+    receipt: "receipt#1",
+    notes: {
+      userId: user._id,
+      key: process.env.RAZOR_PAY_ID,
+    },
+  });
 
-//   res.json(result);
-// });
+  res.json(result);
+});
 
 module.exports = {
-  //   payment,
+  payment,
   getOrderFilter,
   getPendingOrders,
   getMonthlySales,

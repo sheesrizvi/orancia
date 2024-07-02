@@ -13,6 +13,7 @@ const {
   updateOrderToUnPaid,
   updateOrderToPaidAdmin,
   getOrderById,
+  payment,
 } = require("../controller/orderController");
 
 const router = express.Router();
@@ -31,5 +32,6 @@ router.route("/create-order").post(addOrderItems);
 router.route("/update-order-to-paid").post(updateOrderToPaid);
 router.route("/update-order-to-paid-admin").post(updateOrderToPaidAdmin);
 router.route("/update-order-to-unpaid").post(updateOrderToUnPaid);
+router.get("/payment", payment);
 
 module.exports = router;
