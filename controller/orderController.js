@@ -405,10 +405,9 @@ const getOrderFilter = asyncHandler(async (req, res) => {
 });
 
 const payment = asyncHandler(async (req, res) => {
-  const userdtls = JSON.parse(req.query.user);
   const total = JSON.parse(req.query.total);
 
-  const user = await User.findById(userdtls.id);
+  const user = await User.findById(req.query.userId);
 
   const instance = new Razorpay({
     key_id: process.env.RAZOR_PAY_ID,
