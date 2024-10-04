@@ -64,6 +64,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
     totalPrice,
     paymentResult,
     deliveryStatus,
+    deliveredAt,
     userId,
     notes,
     isPaid,
@@ -113,7 +114,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
       notes,
       invoiceId,
       shippingPrice,
-      deliveryAt,
+      deliveredAt,
       paidAt,
       isPaid,
     });
@@ -227,6 +228,8 @@ const getFailedOnlineOrders = asyncHandler(async (req, res) => {
 
   res.json({ orders, pageCount });
 });
+
+
 const updateOrderDeliveryStatus = asyncHandler(async (req, res) => {
   const { orderId, deliveryStatus } = req.body;
 
@@ -281,6 +284,8 @@ const getOrders = asyncHandler(async (req, res) => {
 
   res.json({ orders, pageCount });
 });
+
+
 const getPendingOrders = asyncHandler(async (req, res) => {
   const count = await Order.countDocuments({
     deliveryStatus: { $ne: "Delivered" },
@@ -293,6 +298,38 @@ const getPendingOrders = asyncHandler(async (req, res) => {
 
   res.json(total);
 });
+
+const getPendingOrdersPaginated = asyncHandler(async (req, res) => {
+  const pageSize = 30;
+  const page = Number(req.query.pageNumber) || 1;
+
+  const count = await Order.countDocuments({
+    deliveryStatus: { $ne: "Delivered" },
+  });
+
+  const countCancelled = await Order.countDocuments({
+    deliveryStatus: "Cancelled",
+  });
+
+  const total = count - countCancelled;
+  const pendingOrders = await Order.find({
+    deliveryStatus: { $ne: "Delivered" },
+  })
+    .sort({ createdAt: -1 })
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+    .populate('user', 'id name')
+    .populate('orderItems.product');
+
+  const pageCount = Math.ceil(total / pageSize);
+
+  res.json({
+    total,
+    orders: pendingOrders,
+    pageCount,
+  });
+});
+
 const getMonthlySales = asyncHandler(async (req, res) => {
   const date = req.query.date;
   const pageSize = 30;
@@ -427,6 +464,209 @@ const payment = asyncHandler(async (req, res) => {
   res.json(result);
 });
 
+const searchOrders = asyncHandler(async (req, res) => {
+  const query = req.query.Query;
+  const pageSize = 30;
+  const page = Number(req.query.pageNumber) || 1;
+
+  const matchCriteria = {
+    $or: [
+      { deliveryStatus: { $regex: query, $options: "i" } },
+      { 'orderItems.name': { $regex: query, $options: "i" } },
+    ],
+  };
+
+  const ordersPipeline = [
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    { $unwind: '$user' },
+    {
+      $match: {
+        $or: [
+          { 'user.name': { $regex: query, $options: 'i' } },
+          matchCriteria.$or[0],
+          matchCriteria.$or[1],
+        ],
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    { $skip: pageSize * (page - 1) },
+    { $limit: pageSize },
+  ];
+
+  const countPipeline = [
+    ...ordersPipeline.slice(0, -2),
+    { $count: 'totalOrders' },
+  ];
+
+  const [orders, countResult] = await Promise.all([
+    Order.aggregate(ordersPipeline).exec(),
+    Order.aggregate(countPipeline).exec(),
+  ]);
+
+  const count = countResult.length > 0 ? countResult[0].totalOrders : 0;
+  const pageCount = Math.ceil(count / pageSize);
+
+  if (!orders || orders.length === 0) {
+    return res.status(404).json({ message: 'No orders found' });
+  }
+
+  res.status(200).json({
+    orders,
+    pageCount,
+  });
+});
+
+const deleteOrder = asyncHandler(async (req, res) => {
+ 
+  const { id } = req.query;
+
+  const order = await Order.findById(id);
+
+  if (!order) {
+    return res.status(404).json({ message: 'Order not found' });
+  }
+
+  await Order.findByIdAndDelete(id);
+
+  res.status(200).json({ message: 'Order deleted successfully' });
+});
+
+
+const searchPendingOrders = asyncHandler(async (req, res) => {
+  const query = req.query.Query;
+  const pageSize = 30;
+  const page = Number(req.query.pageNumber) || 1;
+
+  const matchCriteria = {
+    deliveryStatus: { $ne: "Delivered" },
+  };
+
+  const ordersPipeline = [
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    { $unwind: '$user' },
+    {
+      $match: {
+        $and: [
+          matchCriteria,
+          {
+            $or: [
+              { 'user.name': { $regex: query, $options: 'i' } },
+              { deliveryStatus: { $regex: query, $options: 'i' } },
+              { 'orderItems.name': { $regex: query, $options: 'i' } },
+            ],
+          },
+        ],
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    { $skip: pageSize * (page - 1) },
+    { $limit: pageSize },
+  ];
+
+  const countPipeline = [
+    ...ordersPipeline.slice(0, -2),
+    { $count: 'totalOrders' },
+  ];
+
+  const [orders, countResult] = await Promise.all([
+    Order.aggregate(ordersPipeline).exec(),
+    Order.aggregate(countPipeline).exec(),
+  ]);
+
+  const count = countResult.length > 0 ? countResult[0].totalOrders : 0;
+  const pageCount = Math.ceil(count / pageSize);
+
+  if (!orders || orders.length === 0) {
+    return res.status(404).json({ message: 'No pending orders found' });
+  }
+
+  res.status(200).json({
+    orders,
+    pageCount,
+  });
+});
+
+const searchFailedOrders = asyncHandler(async (req, res) => {
+  const query = req.query.Query;
+  const pageSize = 30;
+  const page = Number(req.query.pageNumber) || 1;
+
+  const matchCriteria = {
+    $or: [
+      { deliveryStatus: { $regex: query, $options: "i" } },
+      { 'orderItems.name': { $regex: query, $options: "i" } },
+    ],
+    isPaid: false,
+  };
+
+  const ordersPipeline = [
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    { $unwind: '$user' },
+    {
+      $match: {
+        $and: [
+          { isPaid: false },
+          {
+            $or: [
+              { 'user.name': { $regex: query, $options: 'i' } },
+              matchCriteria.$or[0],
+              matchCriteria.$or[1],
+            ],
+          },
+        ],
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    { $skip: pageSize * (page - 1) },
+    { $limit: pageSize },
+  ];
+
+  const countPipeline = [
+    ...ordersPipeline.slice(0, -2),
+    { $count: 'totalOrders' },
+  ];
+
+  const [orders, countResult] = await Promise.all([
+    Order.aggregate(ordersPipeline).exec(),
+    Order.aggregate(countPipeline).exec(),
+  ]);
+
+  const count = countResult.length > 0 ? countResult[0].totalOrders : 0;
+  const pageCount = Math.ceil(count / pageSize);
+
+  if (!orders || orders.length === 0) {
+    return res.status(404).json({ message: 'No failed orders found' });
+  }
+
+  res.status(200).json({
+    orders,
+    pageCount,
+  });
+});
+
+
+
 module.exports = {
   payment,
   getOrderFilter,
@@ -442,4 +682,9 @@ module.exports = {
   updateOrderToUnPaid,
   getFailedOnlineOrders,
   updateOrderToPaidAdmin,
+  searchOrders,
+  deleteOrder,
+  getPendingOrdersPaginated,
+  searchPendingOrders,
+  searchFailedOrders
 };

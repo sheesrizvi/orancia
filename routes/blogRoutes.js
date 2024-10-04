@@ -7,6 +7,7 @@ const {
 
   getBlogById,
   updateBlog,
+  searchBlog,
 
 } = require("../controller/blogController");
 
@@ -17,5 +18,6 @@ router.post("/update", admin, updateBlog);
 router.get("/", getBlogs);
 router.delete("/delete", admin, deleteBlog);
 router.route("/blogbyid/:id").get(getBlogById);
+router.route("/search-blog").get(searchBlog)
 
 module.exports = router;

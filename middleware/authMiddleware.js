@@ -83,6 +83,7 @@ const seoAdmin = asyncHandler(async (req, res, next) => {
   }
 });
 
+
 module.exports = {
   admin,
   auth,

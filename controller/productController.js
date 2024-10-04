@@ -76,7 +76,9 @@ const createProduct = asyncHandler(async (req, res) => {
     throw new Error("Error");
   }
 });
+
 const updateProduct = asyncHandler(async (req, res) => {
+  
   const {
     groupId,
     sku,
@@ -100,28 +102,34 @@ const updateProduct = asyncHandler(async (req, res) => {
     ingredients,
   } = req.body;
   const ecomProduct = await Product.findById(sku);
+  
   if (ecomProduct) {
-    ecomProduct.name = name;
-    ecomProduct.description = description;
+    ecomProduct.name = name || ecomProduct.name;
+    ecomProduct.description = description || ecomProduct.description;
     ecomProduct.image = image ? image : ecomProduct.image;
-    ecomProduct.category = category;
-    ecomProduct.subcategory = subcategory;
-    ecomProduct.specialcategory = specialcategory;
-    ecomProduct.manufacturer = manufacturer;
-    ecomProduct.details = details;
-    ecomProduct.cost_price = cost_price;
-    ecomProduct.sell_price = sell_price;
-    ecomProduct.discount = discount;
-    ecomProduct.countInStock = countInStock;
-    ecomProduct.tax = tax;
-    ecomProduct.shelflife = shelflife;
-    ecomProduct.expiry = expiry;
-    ecomProduct.hsnCode = hsnCode;
-    ecomProduct.size = size;
-    ecomProduct.ingredients = ingredients;
-    ecomProduct.notes = notes;
+    ecomProduct.category = category || ecomProduct.category;
+    ecomProduct.subcategory = subcategory || ecomProduct.subcategory;
+    ecomProduct.specialcategory = specialcategory || ecomProduct.specialcategory;
+   // ecomProduct.manufacturer = manufacturer || ecomProduct.manufacturer;
+    ecomProduct.details = details || ecomProduct.details;
+    ecomProduct.cost_price = cost_price || ecomProduct.cost_price;
+    ecomProduct.sell_price = sell_price || ecomProduct.sell_price;
+    ecomProduct.discount = discount || ecomProduct.discount;
+    if(countInStock) {
+     const res =  await Inventory.findOneAndUpdate({product: ecomProduct.sku}, {
+        qty: countInStock
+      })
+     
+    }
+   
+    ecomProduct.tax = tax || ecomProduct.tax;
+    ecomProduct.shelflife = shelflife || ecomProduct.shelflife;
+    ecomProduct.expiry = expiry || ecomProduct.expiry;
+    ecomProduct.hsnCode = hsnCode || ecomProduct.hsnCode;
+    ecomProduct.size = size || ecomProduct.size;
+    ecomProduct.ingredients = ingredients || ecomProduct.ingredients;
+    ecomProduct.notes = notes || ecomProduct.notes;
     const updatedProduct = await ecomProduct.save();
-
     res.json(updatedProduct);
   } else {
     res.status(404);
@@ -129,22 +137,27 @@ const updateProduct = asyncHandler(async (req, res) => {
   }
 });
 const deleteProduct = asyncHandler(async (req, res) => {
-  const subid = req.query.id;
-  const sub = await Product.findById(subid);
-
-  const f1 = sub.image;
-  f1.map(async (file) => {
-    const fileName = file.split("//")[1].split("/")[1];
-
-    const command = new DeleteObjectCommand({
-      Bucket: process.env.AWS_BUCKET,
-      Key: fileName,
-    });
-    const response = await s3.send(command);
-  });
-  await Inventory.deleteOne({ product: req.query.id });
-  await Product.deleteOne({ _id: req.query.id });
-  res.json("deleted");
+  try {
+    const subid = req.query.id;
+    const sub = await Product.findById(subid);
+  
+    const f1 = sub.image;
+    // f1.map(async (file) => {
+    //   const fileName = file.split("//")[1].split("/")[1];
+  
+    //   const command = new DeleteObjectCommand({
+    //     Bucket: process.env.AWS_BUCKET,
+    //     Key: fileName,
+    //   });
+    //   const response = await s3.send(command);
+    // });
+    await Inventory.deleteOne({ product: req.query.id });
+    await Product.deleteOne({ _id: req.query.id });
+    res.json("deleted");
+  } catch(e) {
+    throw new Error(e.message)
+  }
+  
 });
 const getAllProduct = asyncHandler(async (req, res) => {
   const {
@@ -171,7 +184,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
   const asArray = Object.entries(filter);
   const filtered = asArray.filter(([key, value]) => value);
   const justStrings = Object.fromEntries(filtered);
-  const pageSize = 40;
+  const pageSize = 1;
   const page = Number(req.query.pageNumber) || 1;
   const count = await Product.countDocuments({
     $and: [
@@ -180,8 +193,8 @@ const getAllProduct = asyncHandler(async (req, res) => {
       { sell_price: { $lte: maxprice } },
     ],
   });
-  var pageCount = Math.floor(count / 40);
-  if (count % 40 !== 0) {
+  var pageCount = Math.floor(count / pageSize);
+  if (count % pageSize !== 0) {
     pageCount = pageCount + 1;
   }
 
@@ -320,24 +333,23 @@ const createProductReview = asyncHandler(async (req, res) => {
   }
 });
 const searchProducts = asyncHandler(async (req, res) => {
-  const products = await Product.aggregate([
-    {
-      $search: {
-        index: "default",
-        text: {
-          query: req.query.Query,
-          path: ["name", "details", "description", "ingredients", "category"],
-        },
-      },
-    },
-  ]);
-
-  if (products) {
-    res.json(products);
-  } else {
-    res.status(404);
-    throw new Error("Product not found");
+  
+  const products = await Product.find({
+    $or: [
+      { name: { $regex: req.query.Query, $options: "i" } },
+      { details: { $regex: req.query.Query, $options: "i" } },
+      { description: { $regex: req.query.Query, $options: "i" } },
+      { ingredients: { $regex: req.query.Query, $options: "i" } },
+      { category: { $regex: req.query.Query, $options: "i" } },
+    ],
+  });
+  
+  if (!products || products.length === 0) {
+    return res.status(404).json({ message: "No products found" });
   }
+  
+  res.status(200).json(products);
+  
 });
 
 module.exports = {

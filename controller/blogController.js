@@ -38,6 +38,7 @@ const createBlog = asyncHandler(async (req, res) => {
     throw new Error("Blog not created");
   }
 });
+
 const updateBlog = asyncHandler(async (req, res) => {
   const { blogId, heading, content, user, image, mdesc, mtitle } = req.body;
 
@@ -113,10 +114,35 @@ const getBlogById = asyncHandler(async (req, res) => {
   }
 });
 
+const searchBlog = asyncHandler(async (req, res) => {
+  const query = req.query.Query?.trim()
+ 
+  const pageNumber = Number(req.query.pageNumber) || 1
+  const pageSize = Number(req.query.pageSize) || 1
+  const totalDocuments = await Blog.countDocuments({})
+  
+  const pageCount = Math.ceil(totalDocuments/pageSize)
+  const searchCriteria = {
+    $or: [
+      { name: { $regex: query , $options: "i" }},
+      { user: { $regex: query, $options: "i" } },
+      { heading: { $regex: query, $options: "i" } },
+      { content: {$regex: query, $options: "i" } },
+      { mtitle: { $regex: query, $options: "i" } },
+      { mdesc: { $regex: query, $options: "i" } }
+    ]
+  }
+  const blogs = await Blog.find(searchCriteria).skip((pageNumber - 1) * pageSize).limit(pageSize)
+
+  res.status(200).send({blogs, pageCount})
+
+})
+
 module.exports = {
   createBlog,
   getBlogs,
   deleteBlog,
   getBlogById,
   updateBlog,
+  searchBlog
 };

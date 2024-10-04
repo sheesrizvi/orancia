@@ -20,8 +20,19 @@ const getCoupon = asyncHandler(async (req, res) => {
 
   res.json(coupons);
 });
+
+const getCouponPaginationApplied = asyncHandler(async (req, res) => {
+  const pageNumber = Number(req.query.pageNumber) || 1
+  const pageSize = Number(req.query.pageSize) || 1
+  const totalDocuments = await Coupon.countDocuments({})
+  
+  const pageCount = Math.ceil(totalDocuments/pageSize)
+  const coupons = await Coupon.find({}).skip((pageNumber  - 1) * pageSize).limit(pageSize)
+  res.status(200).send({coupons, pageCount})
+})
+
 const deleteCoupon = asyncHandler(async (req, res) => {
-  await Banner.deleteOne({ _id: req.query.couponId });
+  await Coupon.deleteOne({ _id: req.query.id });
   res.json("deleted");
 });
 const couponUsed = asyncHandler(async (req, res) => {
@@ -42,10 +53,12 @@ const couponUsed = asyncHandler(async (req, res) => {
   }
 });
 
+
 module.exports = {
   createCoupon,
   getCouponById,
   getCoupon,
   deleteCoupon,
   couponUsed,
+  getCouponPaginationApplied
 };

@@ -54,9 +54,8 @@ router.post(
   admin,
   upload.single("image"),
   async (req, res) => {
-    console.log(req.files, "req");
     const result = req.file;
-    console.log(result, "res");
+   
     //define what to do if result is empty
     res.send(`${result.location}`);
   }
