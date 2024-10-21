@@ -16,7 +16,7 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const { scheduleDHLTokenJob } = require("./controller/dhlController");
 
 const app = express();
-const source = process.env.MONGO_URL;
+const source = process.env.MONGO_URI;
 app.use(
   cors({
     origin: "*",
@@ -44,5 +44,5 @@ mongoose
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Successfully served on port: ${PORT}.`);
-  scheduleDHLTokenJob()
+  //scheduleDHLTokenJob()
 });

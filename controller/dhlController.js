@@ -19,7 +19,7 @@ const generateAccessToken = asyncHandler(async (req, res) => {
        await DHLAccessToken.create({
         token
       })
-
+      res.status(200).send({token})
 })
 
 const getAccessToken = asyncHandler(async (req, res) => {
@@ -102,7 +102,7 @@ const fetchWayBill = asyncHandler(async (req, res) => {
     axios
       .request(options)
       .then(function (response) {
-       
+        console.log(response.data)
         res.status(200).send({waybillInfo: response.data})
       })
       .catch(function (error) {

@@ -276,12 +276,12 @@ const getOrders = asyncHandler(async (req, res) => {
   if (count % 30 !== 0) {
     pageCount = pageCount + 1;
   }
-  const orders = await Order.find({ isPaid: true })
+  const orders = await Order.find({ isPaid: true }).populate('orderItems.product')
     .sort({ createdAt: -1 })
     .limit(pageSize)
     .skip(pageSize * (page - 1))
     .populate("user", "id name");
-
+  console.log(orders)
   res.json({ orders, pageCount });
 });
 

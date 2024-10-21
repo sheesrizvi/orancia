@@ -17,6 +17,7 @@ const authGate= asyncHandler(async (req, res) => {
       _id: admin._id,
       name: admin.name,
       email: admin.email,
+      userType: admin.userType,
       token: generateToken.generateTokenGate(admin._id, admin.name, admin.email, admin.userType),
     });
   } else {
@@ -45,6 +46,7 @@ const registerGate = asyncHandler(async (req, res) => {
       _id: admin._id,
       name: admin.name,
       email: admin.email,
+      userType: admin.userType,
       token: generateToken.generateTokenGate(admin._id, admin.name, admin.email, admin.userType),
     });
   } else {
@@ -63,6 +65,7 @@ const authFinance= asyncHandler(async (req, res) => {
         _id: admin._id,
         name: admin.name,
         email: admin.email,
+        userType: admin.userType,
         token: generateToken.generateTokenFinance(admin._id, admin.name, admin.email, admin.userType),
       });
     } else {
@@ -91,6 +94,7 @@ const authFinance= asyncHandler(async (req, res) => {
         _id: admin._id,
         name: admin.name,
         email: admin.email,
+        userType: admin.userType,
         token: generateToken.generateTokenFinance(admin._id, admin.name, admin.email, admin.userType),
       });
     } else {
@@ -109,6 +113,7 @@ const authFinance= asyncHandler(async (req, res) => {
         _id: admin._id,
         name: admin.name,
         email: admin.email,
+        userType: admin.userType,
         token: generateToken.generateTokenInventory(admin._id, admin.name, admin.email, admin.userType),
       });
     } else {
@@ -137,6 +142,7 @@ const authFinance= asyncHandler(async (req, res) => {
         _id: admin._id,
         name: admin.name,
         email: admin.email,
+        userType: admin.userType,
         token: generateToken.generateTokenInventory(admin._id, admin.name, admin.email, admin.userType),
       });
     } else {
@@ -155,6 +161,7 @@ const authFinance= asyncHandler(async (req, res) => {
         _id: admin._id,
         name: admin.name,
         email: admin.email,
+        userType: admin.userType,
         token: generateToken.generateTokenSeo(admin._id, admin.name, admin.email, admin.userType),
       });
     } else {
@@ -183,6 +190,7 @@ const authFinance= asyncHandler(async (req, res) => {
         _id: admin._id,
         name: admin.name,
         email: admin.email,
+        userType: admin.userType,
         token: generateToken.generateTokenSeo(admin._id, admin.name, admin.email, admin.userType),
       });
     } else {
