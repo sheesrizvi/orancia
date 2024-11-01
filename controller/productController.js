@@ -397,8 +397,7 @@ const mostOrderedProducts = asyncHandler (async (req, res) => {
       $project: {
         _id: "$_id",
         productDetails: 1,
-        totalOrdered: 1,
-        countInStock: "$productDetails.countInStock",
+        totalOrdered: 1
       },
     },
   ]);
