@@ -83,10 +83,12 @@ const checkDeliveryExists = asyncHandler(async(req, res) => {
   axios
     .request(options)
     .then(function (response) {
+      console.log(response)
       const ApexInbound  = response.data.GetServicesforPincodeResult.ApexInbound;
       const ApexOutbound = response.data.GetServicesforPincodeResult.GroundInbound;
 
       return res.status(200).send({
+        result: response.data,
         inboundServiceExist: ApexInbound,
         outboundServiceExist: ApexOutbound
       })
