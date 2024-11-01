@@ -5,41 +5,41 @@ var cron = require('node-cron');
 const schedule = require('node-schedule');
 
 const generateAccessToken = asyncHandler(async (req, res) => {
-    // const options = {
-    //     method: 'GET',
-    //     url: process.env.DHL_GENERATE_TOKEN_URI,
-    //     headers: {
-    //       ClientID: process.env.DHL_CLIENT_ID,
-    //       clientSecret: process.env.DHL_CLIENT_SECRET,
-    //     },
-    //   };
-    //   const tokenResponse = await axios.request(options);
-    //   const { JWTToken: token } = tokenResponse.data;
-    //    await DHLAccessToken.deleteMany({})
-    //    await DHLAccessToken.create({
-    //     token
-    //   })
-   // res.status(200).send({token})
+    const options = {
+        method: 'GET',
+        url: process.env.DHL_GENERATE_TOKEN_URI,
+        headers: {
+          ClientID: process.env.DHL_CLIENT_ID,
+          clientSecret: process.env.DHL_CLIENT_SECRET,
+        },
+      };
+      const tokenResponse = await axios.request(options);
+      const { JWTToken: token } = tokenResponse.data;
+       await DHLAccessToken.deleteMany({})
+       await DHLAccessToken.create({
+        token
+      })
+   res.status(200).send({token})
 
-   const axios = require('axios');
+  //  const axios = require('axios');
 
-   let config = {
-     method: 'get',
-     maxBodyLength: Infinity,
-     url: 'https://apigateway-sandbox.bluedart.com/in/transportation/token/v1/login',
-     headers: { 
-       'ClientID': 'jZe1n37vIhLna3GLzWnvjesCMjZfa1ku', 
-       'clientSecret': 'NhZNIrFtTAMOSmqq'
-     }
-   };
+  //  let config = {
+  //    method: 'get',
+  //    maxBodyLength: Infinity,
+  //    url: 'https://apigateway-sandbox.bluedart.com/in/transportation/token/v1/login',
+  //    headers: { 
+  //      'ClientID': 'jZe1n37vIhLna3GLzWnvjesCMjZfa1ku', 
+  //      'clientSecret': 'NhZNIrFtTAMOSmqq'
+  //    }
+  //  };
    
-   axios.request(config)
-   .then((response) => {
-     console.log(JSON.stringify(response.data));
-   })
-   .catch((error) => {
-     console.log(error);
-   });
+  //  axios.request(config)
+  //  .then((response) => {
+  //    console.log(JSON.stringify(response.data));
+  //  })
+  //  .catch((error) => {
+  //    console.log(error);
+  //  });
 
   
 })
@@ -65,7 +65,7 @@ const checkDeliveryExists = asyncHandler(async(req, res) => {
   
   const options = {
     method: 'POST',
-    url: "https://apigateway-sandbox.bluedart.com/in/transportation/finder/v1/GetServicesforPincode",
+    url: process.env.DHL_PINCODE_CHECK_URI,
     headers: {
       'content-type': 'application/json',
       JWTToken: token,
@@ -73,9 +73,9 @@ const checkDeliveryExists = asyncHandler(async(req, res) => {
     data: {
       pinCode ,
       profile: {
-        LoginID: "LCK69979",
-        Api_type: 'T',
-        LicenceKey: "ot9jirm6pkuufusggnefkr6vgmffkpzj",
+        LoginID: process.env.DHL_LOGIN_ID,
+        Api_type: 'P',
+        LicenceKey: process.env.DHL_LICENSE_KEY,
       },
     },
   };

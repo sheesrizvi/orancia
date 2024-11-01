@@ -360,8 +360,18 @@ const mostOrderedProducts = asyncHandler (async (req, res) => {
   const pageNumber = req.query.pageNumber || 1
   const pageSize = req.query.pageSize || 20
  
-  const totalDocuments = await Order.countDocuments({})
-  const pageCount = Math.ceil(totalDocuments/pageSize)
+  const totalOrderedProducts = await Order.aggregate([
+    { $unwind: "$orderItems" },
+    {
+      $group: {
+        _id: "$orderItems.product",
+      },
+    },
+    { $count: "total" } 
+  ]);
+
+  const totalCount = totalOrderedProducts.length > 0 ? totalOrderedProducts[0].total : 0; 
+  const pageCount = Math.ceil(totalCount / pageSize); 
 
   const mostOrderedProducts = await Order.aggregate([
     { $unwind: "$orderItems" },
