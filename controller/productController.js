@@ -6,6 +6,8 @@ const {
 } = require("@aws-sdk/client-s3");
 const Product = require("../models/productModel");
 const Inventory = require("../models/inventoryModel");
+const Order = require("../models/orderModel");
+
 
 const config = {
   region: process.env.AWS_BUCKET_REGION,
@@ -47,6 +49,7 @@ const createProduct = asyncHandler(async (req, res) => {
     product: sku,
     qty: countInStock,
   });
+  console.log(inputStock)
   const ecomProduct = await Product.create({
     _id: sku,
     groupId,
@@ -69,6 +72,7 @@ const createProduct = asyncHandler(async (req, res) => {
     notes,
     ingredients,
   });
+  console.log(ecomProduct)
   if (ecomProduct) {
     res.status(201).json(ecomProduct);
   } else {
@@ -352,6 +356,63 @@ const searchProducts = asyncHandler(async (req, res) => {
   
 });
 
+const mostOrderedProducts = asyncHandler (async (req, res) => {
+  const pageNumber = req.query.pageNumber || 1
+  const pageSize = req.query.pageSize || 20
+ 
+  const totalDocuments = await Order.countDocuments({})
+  const pageCount = Math.ceil(totalDocuments/pageSize)
+
+  const mostOrderedProducts = await Order.aggregate([
+    { $unwind: "$orderItems" },
+    {
+      $group: {
+        _id: "$orderItems.product",
+        totalOrdered: { $sum: "$orderItems.qty" },
+      },
+    },
+    { $sort: { totalOrdered: -1 } },
+    { $skip: pageSize * (pageNumber - 1) },
+    { $limit: pageSize },
+    {
+      $lookup: {
+        from: "products",
+        localField: "_id",
+        foreignField: "_id",
+        as: "productDetails",
+      },
+    },
+    { $unwind: "$productDetails" },
+    {
+      $project: {
+        _id: "$_id",
+        productDetails: 1,
+        totalOrdered: 1,
+        countInStock: "$productDetails.countInStock",
+      },
+    },
+  ]);
+
+  res.status(200).send({ message: 'Most Ordered Products', mostOrderedProducts, pageCount })
+
+
+})
+
+const getNewArrivalsProducts = asyncHandler(async (req, res) => {
+    const pageNumber = req.query.pageNumber || 1
+    const pageSize = req.query.pageSize || 20
+
+    const products = await Product.find({}).sort({
+      createdAt: -1
+    }).populate(
+      "category subcategory specialcategory size countInStock"
+    ).skip((pageSize) * (pageNumber - 1)).limit(pageSize)
+    const totalDocuments = await Product.countDocuments({})
+    const pageCount = Math.ceil(totalDocuments/pageSize)
+
+    res.status(200).send({message: 'New Arrival Products First', products, pageCount})
+})
+
 module.exports = {
   createProduct,
   updateProduct,
@@ -362,4 +423,6 @@ module.exports = {
   searchProducts,
   getProductByGroupId,
   getProductInventory,
+  mostOrderedProducts,
+  getNewArrivalsProducts
 };

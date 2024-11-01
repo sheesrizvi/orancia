@@ -11,6 +11,8 @@ const {
   createProductReview,
   updateProduct,
   searchProducts,
+  mostOrderedProducts,
+  getNewArrivalsProducts,
 } = require("../controller/productController");
 const {
   createInput,
@@ -30,7 +32,8 @@ router.route("/getall-input").get(getAllInput);
 router.route("/create-review").post(createProductReview);
 router.route("/search-product").get(searchProducts);
 router.route("/delete-inventory").delete(deleteInput)
-
+router.route("/most-ordered-products").get(mostOrderedProducts)
+router.route('/get-new-arrival').get(getNewArrivalsProducts)
 
 // delete
 router.route("/delete").delete(deleteProduct);
