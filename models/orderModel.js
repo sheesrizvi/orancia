@@ -26,6 +26,7 @@ const orderSchema = mongoose.Schema(
       area: { type: String, required: true },
       mobileNumber: { type: Number, required: true },
       email: { type: String, required: true },
+      pinCode: { type: String },
       area: { type: String },
       state: { type: String },
     },
@@ -73,6 +74,9 @@ const orderSchema = mongoose.Schema(
       type: String,
       required: false,
     },
+     wayBill: {
+      type: String
+    }
   },
   {
     timestamps: true,

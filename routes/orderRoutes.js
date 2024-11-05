@@ -17,7 +17,8 @@ const {
   searchOrders,
   deleteOrder,
   getPendingOrdersPaginated,
-  searchPendingOrders
+  searchPendingOrders,
+  getWayBillNumberByOrder
 } = require("../controller/orderController");
 
 const router = express.Router();
@@ -44,5 +45,6 @@ router.route("/get-orders").get(getOrders)
 router.route("/search-orders").get(searchOrders)
 router.route("/search-failed-orders").get(searchOrders)
 router.route("/delete-orders").delete(deleteOrder)
+router.route("/get-waybill-no").get(getWayBillNumberByOrder)
 
 module.exports = router;

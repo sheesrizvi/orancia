@@ -369,7 +369,7 @@ const mostOrderedProducts = asyncHandler (async (req, res) => {
     },
     { $count: "total" } 
   ]);
-
+  console.log(totalOrderedProducts)
   const totalCount = totalOrderedProducts.length > 0 ? totalOrderedProducts[0].total : 0; 
   const pageCount = Math.ceil(totalCount / pageSize); 
 

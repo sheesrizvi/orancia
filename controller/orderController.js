@@ -15,6 +15,7 @@ const Inventory = require("../models/inventoryModel");
 // const { parseISO } = require("date-fns");
 // const OrderPDF = require("./orderPdf");
 const Razorpay = require("razorpay");
+const { generateWayBill } = require("./dhlController");
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -98,6 +99,18 @@ const addOrderItems = asyncHandler(async (req, res) => {
         }
       }
 
+
+      const orderForWayBill = await Order.findOne({_id: order._id}).populate('user')
+      const result =  await generateWayBill(orderForWayBill)
+      if(result) {
+        const updatedOrder = await Order.findByIdAndUpdate(
+          orderForWayBill._id,
+          { $set: { wayBill: result } },
+          { new: true }
+      );
+      return res.status(201).json(updatedOrder);
+      }
+
       //   sendEmail(orderItems, paymentMethod, totalPrice, user);
       res.status(201).json(order);
     }
@@ -120,7 +133,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
     });
     if (order && isPaid == true) {
       // count in stock algo
-
+     
       for (let i = 0; i < orderItems.length; i++) {
         const product = await Inventory.findOne({
           product: orderItems[i].product,
@@ -131,9 +144,20 @@ const addOrderItems = asyncHandler(async (req, res) => {
           const updatedProduct = await product.save();
         }
       }
-
-      //   sendEmail(orderItems, paymentMethod, totalPrice, user);
+      const orderForWayBill = await Order.findOne({_id: order._id}).populate('user')
+      const result =  await generateWayBill(orderForWayBill)
+      if(result) {
+        const updatedOrder = await Order.findByIdAndUpdate(
+          orderForWayBill._id,
+          { $set: { wayBill: result } },
+          { new: true }
+      );
+      return res.status(201).json(updatedOrder);
+      }
+      
       res.status(201).json(order);
+      //   sendEmail(orderItems, paymentMethod, totalPrice, user);
+      // res.status(201).json(order);
     }
   }
 });
@@ -665,7 +689,11 @@ const searchFailedOrders = asyncHandler(async (req, res) => {
   });
 });
 
+const getWayBillNumberByOrder = asyncHandler(async (req, res) => {
+  const order = await Order.findOne({ _id: req.query.orderId })
 
+  res.status(200).send({ order, wayBill: order.wayBill || ""})
+})
 
 module.exports = {
   payment,
@@ -686,5 +714,6 @@ module.exports = {
   deleteOrder,
   getPendingOrdersPaginated,
   searchPendingOrders,
-  searchFailedOrders
+  searchFailedOrders,
+  getWayBillNumberByOrder
 };
