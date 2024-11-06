@@ -265,7 +265,7 @@ const generateWayBill = asyncHandler(async (order) => {
       ConsigneeMaskedContactNumber: "",
       ConsigneeMobile: order.shippingAddress.mobileNumber?.toString() || "",
       ConsigneeName: order.user.name,
-      ConsigneePincode: order.shippingAddress.pinCode?.toString() || "226010", // need to make it dynamically
+      ConsigneePincode: order.shippingAddress.pinCode?.toString() , // need to make it dynamically
       ConsigneeTelephone: ""
     },
     Returnadds: {

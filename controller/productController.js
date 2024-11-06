@@ -188,7 +188,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
   const asArray = Object.entries(filter);
   const filtered = asArray.filter(([key, value]) => value);
   const justStrings = Object.fromEntries(filtered);
-  const pageSize = 1;
+  const pageSize = 20;
   const page = Number(req.query.pageNumber) || 1;
   const count = await Product.countDocuments({
     $and: [
