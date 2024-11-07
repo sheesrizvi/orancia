@@ -29,6 +29,7 @@ const {
   getAllSizePaginationApplied,
   getBannerPaginationApplied,
   searchCoupons,
+  updateSize,
 } = require("../controller/variationController");
 const {
   createCoupon,
@@ -37,6 +38,7 @@ const {
   deleteCoupon,
   couponUsed,
   getCouponPaginationApplied,
+  updateCoupon,
 } = require("../controller/couponController");
 const router = express.Router();
 
@@ -53,8 +55,10 @@ router.route("/specialcategory/get").get(getAllSpecialCategory);
 router.route("/banner/create").post(createBanner);
 router.route("/banner/get").get(getBanner);
 router.route("/size/create").post(createSize);
+router.route("/size/update").post(updateSize);
 router.route("/size/get").get(getAllSize);
 router.route("/coupon/create").post(createCoupon);
+router.route("/coupon/update").post(updateCoupon);
 router.route("/coupon/get").get(getCoupon);
 router.route("/coupon/getById").get(getCouponById);
 router.route("/coupon/post").post(couponUsed);

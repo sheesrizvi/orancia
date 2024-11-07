@@ -305,7 +305,7 @@ const getOrders = asyncHandler(async (req, res) => {
     .limit(pageSize)
     .skip(pageSize * (page - 1))
     .populate("user", "id name");
-  console.log(orders)
+
   res.json({ orders, pageCount });
 });
 

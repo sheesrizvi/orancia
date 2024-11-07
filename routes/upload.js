@@ -8,6 +8,7 @@ const multerS3 = require("multer-s3");
 
 const { admin, auth } = require("../middleware/authmiddleware");
 const { S3Client } = require("@aws-sdk/client-s3");
+const { DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
 const config = {
   region: process.env.AWS_BUCKET_REGION,
@@ -62,7 +63,8 @@ router.post(
 );
 
 router.delete("/deleteImage", admin, async (req, res) => {
-  const image = req.query.image;
+  let image = req.query.image;
+   image = Array.isArray(image) ? image : [image];
   image.map(async (file) => {
     const fileName = file.split("//")[1].split("/")[1];
 

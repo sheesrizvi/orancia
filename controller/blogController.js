@@ -43,6 +43,7 @@ const updateBlog = asyncHandler(async (req, res) => {
   const { blogId, heading, content, user, image, mdesc, mtitle } = req.body;
 
   const blog = await Blog.findById(blogId);
+  
   if (blog) {
     blog.heading = heading;
     blog.content = content;

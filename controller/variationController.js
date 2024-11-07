@@ -97,7 +97,7 @@ const getAllCategory = asyncHandler(async (req, res) => {
 
 const getAllCategoryPaginationApplied = asyncHandler(async (req, res) => {
   const pageNumber = Number(req.query.pageNumber) || 1
-  const pageSize = Number(req.query.pageSize) || 1  
+  const pageSize = Number(req.query.pageSize) || 20
   const totalCategories = await Category.countDocuments({})
   const pageCount = Math.ceil(totalCategories/pageSize)
 
@@ -187,7 +187,7 @@ const getAllSubCategory = asyncHandler(async (req, res) => {
 
 const getAllSubCategoryPaginationApplied = asyncHandler(async(req, res) => {
   const pageNumber = Number(req.query.pageNumber) || 1
-  const pageSize = Number(req.query.pageSize) || 1
+  const pageSize = Number(req.query.pageSize) || 20
   const totalDocuments = await SubCategory.countDocuments({})
 
   const pageCount = Math.ceil(totalDocuments/pageSize)
@@ -221,7 +221,7 @@ const createSpecialCategory = asyncHandler(async (req, res) => {
 });
 const updateSpecialCategory = asyncHandler(async (req, res) => {
   const { id, name, subcategory, image } = req.body;
-
+  
   const ecomCategory = await SpecialCategory.findById(id);
   const sub = await SubCategory.findById(subcategory);
   if (ecomCategory) {
@@ -272,7 +272,7 @@ const getAllSpecialCategory = asyncHandler(async (req, res) => {
 
 const getAllSpecialCategoryPaginationApplied = asyncHandler(async(req, res) => {
   const pageNumber = Number(req.query.pageNumber) || 1
-  const pageSize = Number(req.query.pageSize) || 1
+  const pageSize = Number(req.query.pageSize) || 20
 
   const totalDocuments = await SpecialCategory.countDocuments({})
   const pageCount = Math.ceil(totalDocuments/pageSize)
@@ -298,6 +298,19 @@ const createSize = asyncHandler(async (req, res) => {
   }
 });
 
+const updateSize = asyncHandler(async (req, res) => {
+  const { id, name } = req.body;
+  const ecomCategory = await Size.findById(id)
+  if(!ecomCategory) {
+    return res.status(400).send({message: 'No Size found'})
+  }
+
+  ecomCategory.name = name || ecomCategory.name
+  await ecomCategory.save()
+
+  res.status(200).send(ecomCategory)
+});
+
 const deleteSize = asyncHandler(async (req, res) => {
   await Product.updateMany({ size: req.query.id }, { size: "" });
   await Size.deleteOne({ _id: req.query.id });
@@ -312,7 +325,7 @@ const getAllSize = asyncHandler(async (req, res) => {
 const getAllSizePaginationApplied = asyncHandler(async (req, res) => {
 
   const pageNumber = Number(req.query.pageNumber) || 1
-  const pageSize = Number(req.query.pageSize) || 1
+  const pageSize = Number(req.query.pageSize) || 10
   const totalDocuments = await Size.countDocuments({})
   
   const pageCount = Math.ceil(totalDocuments/pageSize)
@@ -352,7 +365,7 @@ const getBanner = asyncHandler(async (req, res) => {
 
 const getBannerPaginationApplied = asyncHandler(async (req, res) => {
   const pageNumber = Number(req.query.pageNumber) || 1
-  const pageSize = Number(req.query.pageSize) || 1
+  const pageSize = Number(req.query.pageSize) || 20
   const totalDocuments = await Banner.countDocuments({})
   
   const pageCount = Math.ceil(totalDocuments/pageSize)
@@ -513,6 +526,7 @@ module.exports = {
   updateSpecialCategory,
   deleteSpecialCategory,
   createSize,
+  updateSize,
   getAllSize,
   deleteSize,
   getSubCategoryByCategory,

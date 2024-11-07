@@ -10,6 +10,24 @@ const createCoupon = asyncHandler(async (req, res) => {
   res.json(coupon);
 });
 
+
+const updateCoupon = asyncHandler(async (req, res) => {
+  const { couponId, name, discount, limit, usedBy, max } = req.body;
+  const coupon = await Coupon.findById(couponId)
+  if(!coupon) {
+    return res.status(400).send({ message: "Coupon not found" })
+  }
+  
+  coupon.name = name || coupon.name
+  coupon.discount = discount || coupon.discount
+  coupon.limit = limit || coupon.limit
+  coupon.usedBy = usedBy || coupon.usedBy
+  coupon.max = max || coupon.max
+  await coupon.save()
+  res.json(coupon);
+});
+
+
 const getCouponById = asyncHandler(async (req, res) => {
   const coupon = await Coupon.findById(req.query.couponId);
 
@@ -23,7 +41,7 @@ const getCoupon = asyncHandler(async (req, res) => {
 
 const getCouponPaginationApplied = asyncHandler(async (req, res) => {
   const pageNumber = Number(req.query.pageNumber) || 1
-  const pageSize = Number(req.query.pageSize) || 1
+  const pageSize = Number(req.query.pageSize) || 20
   const totalDocuments = await Coupon.countDocuments({})
   
   const pageCount = Math.ceil(totalDocuments/pageSize)
@@ -60,5 +78,6 @@ module.exports = {
   getCoupon,
   deleteCoupon,
   couponUsed,
+  updateCoupon,
   getCouponPaginationApplied
 };

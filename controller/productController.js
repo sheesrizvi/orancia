@@ -49,7 +49,6 @@ const createProduct = asyncHandler(async (req, res) => {
     product: sku,
     qty: countInStock,
   });
-  console.log(inputStock)
   const ecomProduct = await Product.create({
     _id: sku,
     groupId,
@@ -72,7 +71,7 @@ const createProduct = asyncHandler(async (req, res) => {
     notes,
     ingredients,
   });
-  console.log(ecomProduct)
+
   if (ecomProduct) {
     res.status(201).json(ecomProduct);
   } else {
@@ -110,7 +109,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   if (ecomProduct) {
     ecomProduct.name = name || ecomProduct.name;
     ecomProduct.description = description || ecomProduct.description;
-    ecomProduct.image = image ? image : ecomProduct.image;
+    ecomProduct.image = Array.isArray(image) && image.length > 0 ? image : ecomProduct.image;
     ecomProduct.category = category || ecomProduct.category;
     ecomProduct.subcategory = subcategory || ecomProduct.subcategory;
     ecomProduct.specialcategory = specialcategory || ecomProduct.specialcategory;
@@ -213,7 +212,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .skip(pageSize * (page - 1))
     .populate("category subcategory specialcategory size countInStock");
-
+ 
   res.json({ products, pageCount });
 });
 // const getActiveProduct = asyncHandler(async (req, res) => {
@@ -369,7 +368,7 @@ const mostOrderedProducts = asyncHandler (async (req, res) => {
     },
     { $count: "total" } 
   ]);
-  console.log(totalOrderedProducts)
+
   const totalCount = totalOrderedProducts.length > 0 ? totalOrderedProducts[0].total : 0; 
   const pageCount = Math.ceil(totalCount / pageSize); 
 
