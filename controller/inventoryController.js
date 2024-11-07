@@ -20,6 +20,9 @@ const createInput = asyncHandler(async (req, res) => {
     throw new Error("Error");
   }
 });
+
+
+
 const getStocksByProduct = asyncHandler(async (req, res) => {
   const { product } = req.query;
   const inventory = await Inventory.findOne({ product: product });
