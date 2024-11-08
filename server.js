@@ -10,6 +10,7 @@ const upload = require("./routes/upload");
 const blogRoutes = require("./routes/blogRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const deliveryInfoRoutes = require("./routes/deliveryInfoRoutes")
+const reportRoutes = require("./routes/reportRoutes")
 
 const cors = require("cors");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
@@ -33,6 +34,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/delivery", deliveryInfoRoutes)
+app.use("/api/reports", reportRoutes)
 
 app.use(notFound)
 app.use(errorHandler)

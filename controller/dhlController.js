@@ -404,6 +404,7 @@ const generateWayBill = asyncHandler(async (order) => {
   };
  
   const response = await axios.request(options).catch((error) => {
+    console.log(error)
     return false;
   });
 
@@ -500,20 +501,24 @@ const scheduleDHLTokenJob = asyncHandler(() => {
   
   
 const addWayBillInOrder = asyncHandler(async (req, res) => {
-  const { orderId } = req.query
+  
+  const { orderId } = req.body
   const order = await Order.findOne({ _id: orderId }).populate('user')
+  console.log(order)
   if(!order || order.wayBill) {
     return res.status(400).send({message: 'Order not found or Waybill is already attached with order' })
   }
+ 
   const result = await generateWayBill(order)
   if(result) {
     const updatedOrder = await Order.findByIdAndUpdate(
-      orderForWayBill._id,
+     order._id,
       { $set: { wayBill: result } },
       { new: true }
   );
   return res.status(201).json(updatedOrder);
 }
+res.status(400).send({message: 'Waybill generation failed'})
 })
 
 module.exports = {

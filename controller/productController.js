@@ -268,6 +268,48 @@ const getAllProduct = asyncHandler(async (req, res) => {
 //     res.status(201).json(updatedProduct);
 //   }
 // });
+
+const downloadAllProduct = asyncHandler(async (req, res) => {
+  const {
+    category,
+    subcategory,
+    size,
+    specialcategory,
+    price,
+    ratings,
+    min,
+    max,
+  } = req.query;
+
+  const minprice = price ? min : 0;
+  const maxprice = price ? max : 250000000;
+  const filter = {
+    category,
+    size,
+    subcategory,
+    specialcategory,
+
+    rating: ratings,
+  };
+  const asArray = Object.entries(filter);
+  const filtered = asArray.filter(([key, value]) => value);
+  const justStrings = Object.fromEntries(filtered);
+
+
+
+  const products = await Product.find({
+    $and: [
+      justStrings,
+      { sell_price: { $gte: minprice } },
+      { sell_price: { $lte: maxprice } },
+    ],
+  })
+    .sort({ createdAt: -1 })
+    .populate("category subcategory specialcategory size countInStock");
+ 
+  res.json({ products });
+});
+
 const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.query.productId).populate(
     "category subcategory specialcategory size countInStock"
@@ -432,5 +474,6 @@ module.exports = {
   getProductByGroupId,
   getProductInventory,
   mostOrderedProducts,
-  getNewArrivalsProducts
+  getNewArrivalsProducts,
+  downloadAllProduct
 };

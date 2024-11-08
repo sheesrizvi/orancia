@@ -13,6 +13,7 @@ const {
   searchProducts,
   mostOrderedProducts,
   getNewArrivalsProducts,
+  downloadAllProduct,
 } = require("../controller/productController");
 const {
   createInput,
@@ -24,6 +25,7 @@ const router = express.Router();
 router.route("/create").post(createProduct);
 router.route("/update").post(updateProduct)
 router.route("/get").get(getAllProduct);
+router.route("/download").get(downloadAllProduct);
 router.route("/get-by-id").get(getProductById);
 router.route("/get-by-groupid").get(getProductByGroupId);
 router.route("/inventory").get(getProductInventory);

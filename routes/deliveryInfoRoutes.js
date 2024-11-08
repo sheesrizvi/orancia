@@ -10,6 +10,6 @@ router.post("/generate-way-bill", fetchWayBill)
 router.delete("/cancel-way-bill", cancelWayBill) // @ cancel waybill by waybill no
 router.get("/track-shipment", trackShipment) // @ track-shipment
 router.get("/cancel-waybill-by-order", cancelWayBillByOrderNo) // @ cancel waybill by order no
-router.get("/add-waybill-in-order", addWayBillInOrder) // this is only for admin purpose we are adding waybill dynamically in order at time of order creation
+router.post("/add-waybill-in-order", addWayBillInOrder) // this is only for admin purpose we are adding waybill dynamically in order at time of order creation
 
 module.exports = router

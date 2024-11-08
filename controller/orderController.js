@@ -249,7 +249,7 @@ const getFailedOnlineOrders = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(pageSize)
     .skip(pageSize * (page - 1));
-
+ 
   res.json({ orders, pageCount });
 });
 
@@ -309,6 +309,16 @@ const getOrders = asyncHandler(async (req, res) => {
   res.json({ orders, pageCount });
 });
 
+const getOrdersForDownload = asyncHandler(async (req, res) => {
+
+  const orders = await Order.find({ isPaid: true }).populate('orderItems.product')
+    .sort({ createdAt: -1 })
+    .populate("user");
+
+  res.json({ orders });
+});
+
+
 
 const getPendingOrders = asyncHandler(async (req, res) => {
   const count = await Order.countDocuments({
@@ -342,7 +352,7 @@ const getPendingOrdersPaginated = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(pageSize)
     .skip(pageSize * (page - 1))
-    .populate('user', 'id name')
+    .populate('user', 'id name email phone')
     .populate('orderItems.product');
 
   const pageCount = Math.ceil(total / pageSize);
@@ -351,6 +361,33 @@ const getPendingOrdersPaginated = asyncHandler(async (req, res) => {
     total,
     orders: pendingOrders,
     pageCount,
+  });
+});
+
+
+const getPendingOrdersForDownload = asyncHandler(async (req, res) => {
+
+  const count = await Order.countDocuments({
+    deliveryStatus: { $ne: "Delivered" },
+  });
+
+  const countCancelled = await Order.countDocuments({
+    deliveryStatus: "Cancelled",
+  });
+
+  const total = count - countCancelled;
+  const pendingOrders = await Order.find({
+    deliveryStatus: { $ne: "Delivered" },
+  })
+    .sort({ createdAt: -1 })
+    .populate('user', 'id name email phone')
+    .populate('orderItems.product');
+
+  const pageCount = Math.ceil(total / pageSize);
+
+  res.json({
+    total,
+    orders: pendingOrders,
   });
 });
 
@@ -715,5 +752,7 @@ module.exports = {
   getPendingOrdersPaginated,
   searchPendingOrders,
   searchFailedOrders,
-  getWayBillNumberByOrder
+  getWayBillNumberByOrder,
+  getOrdersForDownload,
+  getPendingOrdersForDownload
 };
