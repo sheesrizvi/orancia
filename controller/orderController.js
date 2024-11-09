@@ -72,6 +72,9 @@ const addOrderItems = asyncHandler(async (req, res) => {
   } = req.body;
 
   if (paymentMethod == "COD") {
+
+
+
     const order = await Order.create({
       orderItems,
       user: userId,
@@ -87,6 +90,8 @@ const addOrderItems = asyncHandler(async (req, res) => {
       shippingPrice,
       paidAt,
     });
+
+
     if (order) {
       for (let i = 0; i < orderItems.length; i++) {
         const product = await Inventory.findOne({
@@ -100,21 +105,22 @@ const addOrderItems = asyncHandler(async (req, res) => {
       }
 
 
-      const orderForWayBill = await Order.findOne({_id: order._id}).populate('user')
-      const result =  await generateWayBill(orderForWayBill)
-      if(result) {
+      const orderForWayBill = await Order.findOne({ _id: order._id }).populate('user')
+      const result = await generateWayBill(orderForWayBill)
+      if (result) {
         const updatedOrder = await Order.findByIdAndUpdate(
           orderForWayBill._id,
           { $set: { wayBill: result } },
           { new: true }
-      );
-      return res.status(201).json(updatedOrder);
+        );
+        return res.status(201).json(updatedOrder);
       }
 
       //   sendEmail(orderItems, paymentMethod, totalPrice, user);
       res.status(201).json(order);
     }
   } else {
+
     const order = await Order.create({
       orderItems,
       user: userId,
@@ -133,7 +139,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
     });
     if (order && isPaid == true) {
       // count in stock algo
-     
+
       for (let i = 0; i < orderItems.length; i++) {
         const product = await Inventory.findOne({
           product: orderItems[i].product,
@@ -144,17 +150,17 @@ const addOrderItems = asyncHandler(async (req, res) => {
           const updatedProduct = await product.save();
         }
       }
-      const orderForWayBill = await Order.findOne({_id: order._id}).populate('user')
-      const result =  await generateWayBill(orderForWayBill)
-      if(result) {
+      const orderForWayBill = await Order.findOne({ _id: order._id }).populate('user')
+      const result = await generateWayBill(orderForWayBill)
+      if (result) {
         const updatedOrder = await Order.findByIdAndUpdate(
           orderForWayBill._id,
           { $set: { wayBill: result } },
           { new: true }
-      );
-      return res.status(201).json(updatedOrder);
+        );
+        return res.status(201).json(updatedOrder);
       }
-      
+
       res.status(201).json(order);
       //   sendEmail(orderItems, paymentMethod, totalPrice, user);
       // res.status(201).json(order);
@@ -249,7 +255,7 @@ const getFailedOnlineOrders = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(pageSize)
     .skip(pageSize * (page - 1));
- 
+
   res.json({ orders, pageCount });
 });
 
@@ -585,7 +591,7 @@ const searchOrders = asyncHandler(async (req, res) => {
 });
 
 const deleteOrder = asyncHandler(async (req, res) => {
- 
+
   const { id } = req.query;
 
   const order = await Order.findById(id);
@@ -729,7 +735,7 @@ const searchFailedOrders = asyncHandler(async (req, res) => {
 const getWayBillNumberByOrder = asyncHandler(async (req, res) => {
   const order = await Order.findOne({ _id: req.query.orderId })
 
-  res.status(200).send({ order, wayBill: order.wayBill || ""})
+  res.status(200).send({ order, wayBill: order.wayBill || "" })
 })
 
 module.exports = {
