@@ -7,50 +7,50 @@ const Order = require('../models/orderModel');
 
 const generateAccessToken = asyncHandler(async (req, res) => {
 
-   let config = {
-     method: 'get',
-     maxBodyLength: Infinity,
-     url: process.env.DHL_PRODUCTION_GENERATE_TOKEN_URI,
-     headers: { 
-       'ClientID': process.env.DHL_PRODUCTION_CLIENT_ID, 
-       'clientSecret': process.env.DHL_PRODUCTION_CLIENT_SECRET
-     }
-   };
-   
-   await axios.request(config)
-   .then(async (response) => {
-     const { JWTToken: token } = response.data
-     await DHLAccessToken.deleteMany({})
-     await DHLAccessToken.create({
-           token
-      })
-     res.status(200).send(token)
-   })
-   .catch((error) => {
-     res.send(error)
-   });
+  let config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: process.env.DHL_PRODUCTION_GENERATE_TOKEN_URI,
+    headers: {
+      'ClientID': process.env.DHL_PRODUCTION_CLIENT_ID,
+      'clientSecret': process.env.DHL_PRODUCTION_CLIENT_SECRET
+    }
+  };
 
-  
+  await axios.request(config)
+    .then(async (response) => {
+      const { JWTToken: token } = response.data
+      await DHLAccessToken.deleteMany({})
+      await DHLAccessToken.create({
+        token
+      })
+      res.status(200).send(token)
+    })
+    .catch((error) => {
+      res.send(error)
+    });
+
+
 })
 
 const getAccessToken = asyncHandler(async (req, res) => {
- 
-  const tokenDocument =  await DHLAccessToken.findOne({})
+
+  const tokenDocument = await DHLAccessToken.findOne({})
   let token
-  if(tokenDocument) {
+  if (tokenDocument) {
     token = tokenDocument.token
   } else {
     return res.status(400).send({ message: 'Auth Token not found' })
   }
-  res.status(200).send({token})
+  res.status(200).send({ token })
 })
 
-const checkDeliveryExists = asyncHandler(async(req, res) => {
+const checkDeliveryExists = asyncHandler(async (req, res) => {
   const { pinCode } = req.query
-  if(!pinCode) return res.status(400).send({message: 'PinCode is required'})
-  const tokenDocument =  await DHLAccessToken.findOne({})
+  if (!pinCode) return res.status(400).send({ message: 'PinCode is required' })
+  const tokenDocument = await DHLAccessToken.findOne({})
   let token
-  if(tokenDocument) {
+  if (tokenDocument) {
     token = tokenDocument.token
   } else {
     return res.status(400).send({ message: 'DHL Token not found' })
@@ -68,25 +68,25 @@ const checkDeliveryExists = asyncHandler(async(req, res) => {
     method: 'post',
     maxBodyLength: Infinity,
     url: process.env.DHL_PRODUCTION_PINCODE_TRACKING_URI,
-    headers: { 
-      'content-type': 'application/json', 
+    headers: {
+      'content-type': 'application/json',
       'JWTToken': token
     },
-    data : data
+    data: data
   };
-  
+
   const response = await axios.request(config).catch((error) => {
     return res.status(400).send(error)
   });
 
   if (response && response.data && response.data.GetServicesforPincodeResult) {
-    const ApexInbound  = response.data.GetServicesforPincodeResult?.ApexInbound 
+    const ApexInbound = response.data.GetServicesforPincodeResult?.ApexInbound
     const ApexOutbound = response.data.GetServicesforPincodeResult?.GroundInbound;
     return res.status(200).send({
-            result: response.data,
-            inboundServiceExist: ApexInbound || undefined,
-            outboundServiceExist: ApexOutbound || undefined
-          })
+      result: response.data,
+      inboundServiceExist: ApexInbound || undefined,
+      outboundServiceExist: ApexOutbound || undefined
+    })
   } else {
     return res.status(400).send();
   }
@@ -95,102 +95,52 @@ const checkDeliveryExists = asyncHandler(async(req, res) => {
 // @ only for testing purpose as of now
 const fetchWayBill = asyncHandler(async (req, res) => {
   const { Request } = req.body
-  const tokenDocument =  await DHLAccessToken.findOne({})
+  const tokenDocument = await DHLAccessToken.findOne({})
   let token
-  if(tokenDocument) {
+  if (tokenDocument) {
     token = tokenDocument.token
   } else {
     return res.status(400).send({ message: 'Auth Token not found' })
   }
 
-    const options = {
-      method: 'POST',
-      url: process.env.DHL_PRODUCTION_GENERATE_WAYBILL_URI,
-      headers: {
-        'content-type': 'application/json',
-        JWTToken: token,
-      },
-      data: {
-       Request: Request ,
-       Profile: {
+  const options = {
+    method: 'POST',
+    url: process.env.DHL_PRODUCTION_GENERATE_WAYBILL_URI,
+    headers: {
+      'content-type': 'application/json',
+      JWTToken: token,
+    },
+    data: {
+      Request: Request,
+      Profile: {
         LoginID: process.env.DHL_PRODUCTION_LOGIN_ID,
         Api_type: process.env.DHL_SHIPPING_API_TYPE,
         LicenceKey: process.env.DHL_PRODUCTION_SHIPPING_LICENSE_KEY,
       },
-      },
-    };
-  
-    await axios
-      .request(options)
-      .then(function (response) {
-        res.status(200).send({waybillInfo: response.data})
+    },
+  };
+
+  await axios
+    .request(options)
+    .then(function (response) {
+      res.status(200).send({ waybillInfo: response.data })
+    })
+    .catch(function (error) {
+      res.status(400).send({
+        message: 'Waybill error',
+        error
       })
-      .catch(function (error) {
-        res.status(400).send({
-            message: 'Waybill error',
-            error
-        })
-      });
-
-   
-  });
+    });
 
 
-  const cancelWayBill = asyncHandler(async (req, res) => {
-    const { wayBillNo } = req.query
-    const tokenDocument =  await DHLAccessToken.findOne({})
-    let token
-    if(tokenDocument) {
-      token = tokenDocument.token
-    } else {
-      return res.status(400).send({ message: 'Auth Token not found' })
-    }
-    const options = {
-      method: 'POST',
-      url: process.env.DHL_PRODUCTION_CANCEL_WAYBILL_URI,
-      headers: {
-        'content-type': 'application/json',
-        JWTToken:token,
-      },
-      data: {
-        Request: { AWBNo: wayBillNo },
-        Profile: {
-            LoginID: process.env.DHL_PRODUCTION_LOGIN_ID,
-            Api_type: process.env.DHL_SHIPPING_API_TYPE,
-            LicenceKey: process.env.DHL_PRODUCTION_SHIPPING_LICENSE_KEY,
-          },
-      },
-    };
-  
-    try {
-      const response = await axios.request(options);
-      if (response) {
-        await Order.findOneAndUpdate(
-          { wayBill: wayBillNo },
-          { $unset: { wayBill: "" } },
-          { new: true }
-        );
-      }
-      return res.status(200).send({ message: 'Waybill Cancelled Successfully' });
-      
-    } catch (error) {
-      return res.status(400).send({ message: 'Waybill Error', error });
-    }
-  });
+});
 
-const cancelWayBillByOrderNo = asyncHandler(async (req, res) => {
-  const { orderId } = req.query
-  const order = await Order.findOne({ _id: orderId })
-  
-  if(!order || !order.wayBill) {
-    return res.status(400).send({ message: 'Order or WayBill Number is not found' })
-  }
-  
-  const wayBillNo = order.wayBill
 
-  const tokenDocument =  await DHLAccessToken.findOne({})
+const cancelWayBill = asyncHandler(async (req, res) => {
+  const { wayBillNo } = req.query
+  const tokenDocument = await DHLAccessToken.findOne({})
   let token
-  if(tokenDocument) {
+  if (tokenDocument) {
     token = tokenDocument.token
   } else {
     return res.status(400).send({ message: 'Auth Token not found' })
@@ -200,15 +150,65 @@ const cancelWayBillByOrderNo = asyncHandler(async (req, res) => {
     url: process.env.DHL_PRODUCTION_CANCEL_WAYBILL_URI,
     headers: {
       'content-type': 'application/json',
-      JWTToken:token,
+      JWTToken: token,
     },
     data: {
       Request: { AWBNo: wayBillNo },
       Profile: {
-          LoginID: process.env.DHL_PRODUCTION_LOGIN_ID,
-          Api_type: process.env.DHL_SHIPPING_API_TYPE,
-          LicenceKey: process.env.DHL_PRODUCTION_SHIPPING_LICENSE_KEY,
-        },
+        LoginID: process.env.DHL_PRODUCTION_LOGIN_ID,
+        Api_type: process.env.DHL_SHIPPING_API_TYPE,
+        LicenceKey: process.env.DHL_PRODUCTION_SHIPPING_LICENSE_KEY,
+      },
+    },
+  };
+
+  try {
+    const response = await axios.request(options);
+    if (response) {
+      await Order.findOneAndUpdate(
+        { wayBill: wayBillNo },
+        { $unset: { wayBill: "" } },
+        { new: true }
+      );
+    }
+    return res.status(200).send({ message: 'Waybill Cancelled Successfully' });
+
+  } catch (error) {
+    return res.status(400).send({ message: 'Waybill Error', error });
+  }
+});
+
+const cancelWayBillByOrderNo = asyncHandler(async (req, res) => {
+  const { orderId } = req.query
+  const order = await Order.findOne({ _id: orderId })
+
+  if (!order || !order.wayBill) {
+    return res.status(400).send({ message: 'Order or WayBill Number is not found' })
+  }
+
+  const wayBillNo = order.wayBill
+
+  const tokenDocument = await DHLAccessToken.findOne({})
+  let token
+  if (tokenDocument) {
+    token = tokenDocument.token
+  } else {
+    return res.status(400).send({ message: 'Auth Token not found' })
+  }
+  const options = {
+    method: 'POST',
+    url: process.env.DHL_PRODUCTION_CANCEL_WAYBILL_URI,
+    headers: {
+      'content-type': 'application/json',
+      JWTToken: token,
+    },
+    data: {
+      Request: { AWBNo: wayBillNo },
+      Profile: {
+        LoginID: process.env.DHL_PRODUCTION_LOGIN_ID,
+        Api_type: process.env.DHL_SHIPPING_API_TYPE,
+        LicenceKey: process.env.DHL_PRODUCTION_SHIPPING_LICENSE_KEY,
+      },
     },
   };
 
@@ -219,18 +219,18 @@ const cancelWayBillByOrderNo = asyncHandler(async (req, res) => {
         $unset: { wayBill: "" }
       }, { new: true })
     }).then((result) => {
-      return res.status(200).send({ message: 'Waybill Cancelled Succesfully', order: result})
+      return res.status(200).send({ message: 'Waybill Cancelled Succesfully', order: result })
     })
     .catch(function (error) {
-      res.status(400).send({message: 'Waybill Error', error})
+      res.status(400).send({ message: 'Waybill Error', error })
     });
 
 })
 const generateWayBill = asyncHandler(async (order) => {
- 
-  const tokenDocument =  await DHLAccessToken.findOne({})
+
+  const tokenDocument = await DHLAccessToken.findOne({})
   let token
-  if(tokenDocument) {
+  if (tokenDocument) {
     token = tokenDocument.token
   } else {
     return false
@@ -238,16 +238,16 @@ const generateWayBill = asyncHandler(async (order) => {
 
   const createdAtDate = new Date(order.createdAt);
   const pickupDate = new Date(createdAtDate);
-  pickupDate.setDate(pickupDate.getDate() + 2); 
+  pickupDate.setDate(pickupDate.getDate() + 2);
   const formattedPickupDate = `/Date(${pickupDate.getTime()})/`
   const formattedOrderDate = `/Date(${createdAtDate.getTime()})/`
   const prefix = 'TestCr3_lck';
   const randomNumber = Math.floor(100000000 + Math.random() * 900000000);
   const creditReference = `${prefix}${randomNumber}`
-  
- 
- 
-  const Request =  {
+
+
+
+  const Request = {
     Consignee: {
       AvailableDays: "",
       AvailableTiming: "",
@@ -258,14 +258,14 @@ const generateWayBill = asyncHandler(async (order) => {
       ConsigneeAddressinfo: "",
       ConsigneeAttention: order.user.name,
       ConsigneeEmailID: order.shippingAddress.email,
-      ConsigneeFullAddress:  `${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.state}`,
+      ConsigneeFullAddress: `${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.state}`,
       ConsigneeGSTNumber: "",
       ConsigneeLatitude: "",
       ConsigneeLongitude: "",
       ConsigneeMaskedContactNumber: "",
       ConsigneeMobile: order.shippingAddress.mobileNumber?.toString() || "",
       ConsigneeName: order.user.name,
-      ConsigneePincode: order.shippingAddress.pinCode?.toString() , // need to make it dynamically
+      ConsigneePincode: order.shippingAddress.pincode?.toString(), // need to make it dynamically
       ConsigneeTelephone: ""
     },
     Returnadds: {
@@ -394,15 +394,15 @@ const generateWayBill = asyncHandler(async (order) => {
       JWTToken: token,
     },
     data: {
-     Request: Request ,
-     Profile: {
-      LoginID: process.env.DHL_PRODUCTION_LOGIN_ID,
-      Api_type: process.env.DHL_SHIPPING_API_TYPE,
-      LicenceKey: process.env.DHL_PRODUCTION_SHIPPING_LICENSE_KEY,
-    },
+      Request: Request,
+      Profile: {
+        LoginID: process.env.DHL_PRODUCTION_LOGIN_ID,
+        Api_type: process.env.DHL_SHIPPING_API_TYPE,
+        LicenceKey: process.env.DHL_PRODUCTION_SHIPPING_LICENSE_KEY,
+      },
     },
   };
- 
+
   const response = await axios.request(options).catch((error) => {
     console.log(error)
     return false;
@@ -410,30 +410,30 @@ const generateWayBill = asyncHandler(async (order) => {
 
   if (response && response.data && response.data.GenerateWayBillResult) {
     const awbNo = response.data.GenerateWayBillResult.AWBNo;
-    
-    
+
+
     const wayBillOrder = await Order.findOne({ _id: order._id });
     wayBillOrder.wayBill = awbNo;
     await wayBillOrder.save();
-  
+
     return awbNo;
   } else {
     return false;
   }
-  
+
 })
 
 
 const trackShipment = async (req, res) => {
-     const { wayBillNo } = req.query
-    const tokenDocument =  await DHLAccessToken.findOne({})
-    let token
-    if(tokenDocument) {
-      token = tokenDocument.token
-    } else {
-      return false
-    }
-  
+  const { wayBillNo } = req.query
+  const tokenDocument = await DHLAccessToken.findOne({})
+  let token
+  if (tokenDocument) {
+    token = tokenDocument.token
+  } else {
+    return false
+  }
+
   const options = {
     method: 'GET',
     url: process.env.DHL_PRODUCTION_SHIPMENT_TRACK_URI,
@@ -447,7 +447,7 @@ const trackShipment = async (req, res) => {
       action: 'custawbquery',
       verno: '1',
       awb: 'awb'
-  },
+    },
     headers: {
       JWTToken: token,
     },
@@ -459,7 +459,7 @@ const trackShipment = async (req, res) => {
       res.status(200).send(response.data)
     })
     .catch(function (error) {
-      res.status(400).send({message: 'Shipment Tracking Error', error})
+      res.status(400).send({ message: 'Shipment Tracking Error', error })
     });
 };
 
@@ -469,23 +469,23 @@ const generateTokenInInterval = asyncHandler(async (req, res) => {
     method: 'get',
     maxBodyLength: Infinity,
     url: process.env.DHL_PRODUCTION_GENERATE_TOKEN_URI,
-    headers: { 
-      'ClientID': process.env.DHL_PRODUCTION_CLIENT_ID, 
+    headers: {
+      'ClientID': process.env.DHL_PRODUCTION_CLIENT_ID,
       'clientSecret': process.env.DHL_PRODUCTION_CLIENT_SECRET
     }
   };
-  
+
   await axios.request(config)
-  .then(async (response) => {
-    const { JWTToken: token } = response.data
-    await DHLAccessToken.deleteMany({})
-    await DHLAccessToken.create({
-          token
-     })
-  })
-  .catch((error) => {
-    console.log(error)
-  });
+    .then(async (response) => {
+      const { JWTToken: token } = response.data
+      await DHLAccessToken.deleteMany({})
+      await DHLAccessToken.create({
+        token
+      })
+    })
+    .catch((error) => {
+      console.log(error)
+    });
 
 
 })
@@ -495,41 +495,41 @@ const scheduleDHLTokenJob = asyncHandler(() => {
   rule.hour = 0;
   rule.minute = 0;
   schedule.scheduleJob(rule, async function () {
-        await generateTokenInInterval();
-    })
-  });
-  
-  
+    await generateTokenInInterval();
+  })
+});
+
+
 const addWayBillInOrder = asyncHandler(async (req, res) => {
-  
+
   const { orderId } = req.body
   const order = await Order.findOne({ _id: orderId }).populate('user')
   console.log(order)
-  if(!order || order.wayBill) {
-    return res.status(400).send({message: 'Order not found or Waybill is already attached with order' })
+  if (!order || order.wayBill) {
+    return res.status(400).send({ message: 'Order not found or Waybill is already attached with order' })
   }
- 
+
   const result = await generateWayBill(order)
-  if(result) {
+  if (result) {
     const updatedOrder = await Order.findByIdAndUpdate(
-     order._id,
+      order._id,
       { $set: { wayBill: result } },
       { new: true }
-  );
-  return res.status(201).json(updatedOrder);
-}
-res.status(400).send({message: 'Waybill generation failed'})
+    );
+    return res.status(201).json(updatedOrder);
+  }
+  res.status(400).send({ message: 'Waybill generation failed' })
 })
 
 module.exports = {
-generateAccessToken,
-getAccessToken,
-fetchWayBill,
-cancelWayBill,
-checkDeliveryExists,
-trackShipment,
-scheduleDHLTokenJob,
-generateWayBill,
-cancelWayBillByOrderNo,
-addWayBillInOrder
+  generateAccessToken,
+  getAccessToken,
+  fetchWayBill,
+  cancelWayBill,
+  checkDeliveryExists,
+  trackShipment,
+  scheduleDHLTokenJob,
+  generateWayBill,
+  cancelWayBillByOrderNo,
+  addWayBillInOrder
 }

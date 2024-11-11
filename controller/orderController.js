@@ -249,22 +249,12 @@ const getFailedOnlineOrders = asyncHandler(async (req, res) => {
   if (count % 10 !== 0) {
     pageCount = pageCount + 1;
   }
-  const orders = await Order.find({ isPaid: false }).populate('user')
+  const orders = await Order.find({ isPaid: false })
     .sort({ createdAt: -1 })
     .limit(pageSize)
     .skip(pageSize * (page - 1));
-  console.log(orders)
-  res.json({ orders, pageCount });
-});
-
-
-const getFailedOnlineOrdersForDownload = asyncHandler(async (req, res) => {
-  
-  const orders = await Order.find({ isPaid: false }).populate('user')
-    .sort({ createdAt: -1 })
-
  
-  res.json({ orders });
+  res.json({ orders, pageCount });
 });
 
 
@@ -381,15 +371,15 @@ const getPendingOrdersPaginated = asyncHandler(async (req, res) => {
 
 const getPendingOrdersForDownload = asyncHandler(async (req, res) => {
 
-  // const count = await Order.countDocuments({
-  //   deliveryStatus: { $ne: "Delivered" },
-  // });
+  const count = await Order.countDocuments({
+    deliveryStatus: { $ne: "Delivered" },
+  });
 
-  // const countCancelled = await Order.countDocuments({
-  //   deliveryStatus: "Cancelled",
-  // });
+  const countCancelled = await Order.countDocuments({
+    deliveryStatus: "Cancelled",
+  });
 
-  // const total = count - countCancelled;
+  const total = count - countCancelled;
   const pendingOrders = await Order.find({
     deliveryStatus: { $ne: "Delivered" },
   })
@@ -397,9 +387,10 @@ const getPendingOrdersForDownload = asyncHandler(async (req, res) => {
     .populate('user', 'id name email phone')
     .populate('orderItems.product');
 
-//  const pageCount = Math.ceil(total / pageSize);
+  const pageCount = Math.ceil(total / pageSize);
 
   res.json({
+    total,
     orders: pendingOrders,
   });
 });
@@ -767,6 +758,5 @@ module.exports = {
   searchFailedOrders,
   getWayBillNumberByOrder,
   getOrdersForDownload,
-  getPendingOrdersForDownload,
-  getFailedOnlineOrdersForDownload
+  getPendingOrdersForDownload
 };

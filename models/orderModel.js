@@ -26,7 +26,7 @@ const orderSchema = mongoose.Schema(
       area: { type: String, required: true },
       mobileNumber: { type: Number, required: true },
       email: { type: String, required: true },
-      pinCode: { type: String, required: true },
+      pincode: { type: String, required: true },
       state: { type: String },
     },
     emailDelivery: {
@@ -73,7 +73,7 @@ const orderSchema = mongoose.Schema(
       type: String,
       required: false,
     },
-     wayBill: {
+    wayBill: {
       type: String
     }
   },
