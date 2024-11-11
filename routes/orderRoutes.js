@@ -21,7 +21,7 @@ const {
   getWayBillNumberByOrder,
   getPendingOrdersForDownload,
   getOrdersForDownload,
-  // getFailedOnlineOrdersForDownload
+   getFailedOnlineOrdersForDownload
 } = require("../controller/orderController");
 
 const router = express.Router();
@@ -39,7 +39,7 @@ router.route("/myorders1").get(getMyOrders);
 router.route("/myorders-details").get(getOrderById);
 router.route("/orderfilter").get(getOrderFilter);
 router.route("/online-failed").get(getFailedOnlineOrders);
-// router.route("/online-failed-for-download").get(getFailedOnlineOrdersForDownload);
+router.route("/online-failed-for-download").get(getFailedOnlineOrdersForDownload);
 router.route("/update").post(updateOrderDeliveryStatus);
 router.route("/create-order").post(addOrderItems);
 router.route("/update-order-to-paid").post(updateOrderToPaid);
