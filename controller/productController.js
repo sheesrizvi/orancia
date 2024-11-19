@@ -119,7 +119,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     ecomProduct.sell_price = sell_price || ecomProduct.sell_price;
     ecomProduct.discount = discount || ecomProduct.discount;
     if(countInStock) {
-     const res =  await Inventory.findOneAndUpdate({product: ecomProduct.sku}, {
+    
+     const res =  await Inventory.findOneAndUpdate({product: ecomProduct._id}, {
         qty: countInStock
       })
      
@@ -387,7 +388,7 @@ const searchProducts = asyncHandler(async (req, res) => {
       { ingredients: { $regex: req.query.Query, $options: "i" } },
       { category: { $regex: req.query.Query, $options: "i" } },
     ],
-  });
+  }).populate("category subcategory specialcategory size countInStock");;
   
   if (!products || products.length === 0) {
     return res.status(404).json({ message: "No products found" });

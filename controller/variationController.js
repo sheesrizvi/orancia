@@ -375,16 +375,18 @@ const getBannerPaginationApplied = asyncHandler(async (req, res) => {
 
 
 const deleteBanner = asyncHandler(async (req, res) => {
+  console.log('del')
   const subid = req.query.id;
   const sub = await Banner.findById(subid);
 
   const f1 = sub.image;
-  const fileName = f1.split("//")[1].split("/")[1];
-  const command = new DeleteObjectCommand({
-    Bucket: process.env.AWS_BUCKET,
-    Key: fileName,
-  });
-  const response = await s3.send(command);
+  // const fileName = f1.split("//")[1].split("/")[1];
+  // const command = new DeleteObjectCommand({
+  //   Bucket: process.env.AWS_BUCKET,
+  //   Key: fileName,
+  // });
+  // const response = await s3.send(command);
+   
   await Banner.deleteOne({ _id: req.query.id });
   res.json("deleted");
 });
