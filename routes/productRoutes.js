@@ -14,6 +14,7 @@ const {
   mostOrderedProducts,
   getNewArrivalsProducts,
   downloadAllProduct,
+  getAllProductsByStockSorting
 } = require("../controller/productController");
 const {
   createInput,
@@ -25,6 +26,7 @@ const router = express.Router();
 router.route("/create").post(createProduct);
 router.route("/update").post(updateProduct)
 router.route("/get").get(getAllProduct);
+router.route("/get-by-count-in-stock").get(getAllProductsByStockSorting);
 router.route("/download").get(downloadAllProduct);
 router.route("/get-by-id").get(getProductById);
 router.route("/get-by-groupid").get(getProductByGroupId);

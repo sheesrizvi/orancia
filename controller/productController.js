@@ -216,6 +216,61 @@ const getAllProduct = asyncHandler(async (req, res) => {
  
   res.json({ products, pageCount });
 });
+
+const getAllProductsByStockSorting = asyncHandler(async (req, res) => {
+  const {
+    category,
+    subcategory,
+    size,
+    specialcategory,
+    price,
+    ratings,
+    min,
+    max,
+  } = req.query;
+
+  const minprice = price ? min : 0;
+  const maxprice = price ? max : 250000000;
+  const filter = {
+    category,
+    size,
+    subcategory,
+    specialcategory,
+
+    rating: ratings,
+  };
+  const asArray = Object.entries(filter);
+  const filtered = asArray.filter(([key, value]) => value);
+  const justStrings = Object.fromEntries(filtered);
+  const pageSize = 20;
+  const page = Number(req.query.pageNumber) || 1;
+  const count = await Product.countDocuments({
+    $and: [
+      justStrings,
+      { sell_price: { $gte: minprice } },
+      { sell_price: { $lte: maxprice } },
+    ],
+  });
+  var pageCount = Math.floor(count / pageSize);
+  if (count % pageSize !== 0) {
+    pageCount = pageCount + 1;
+  }
+
+  const products = await Product.find({
+    $and: [
+      justStrings,
+      { sell_price: { $gte: minprice } },
+      { sell_price: { $lte: maxprice } },
+    ],
+  })
+    .limit(pageSize)
+    .sort({ 'countInStock.qty': 1 })
+    .skip(pageSize * (page - 1))
+    .populate("category subcategory specialcategory size countInStock");
+ 
+  res.json({ products, pageCount });
+});
+
 // const getActiveProduct = asyncHandler(async (req, res) => {
 //   const { ecomCategory, ecomBrand, price, ratings, min, max } = req.query;
 //   const minprice = price ? min : 0;
@@ -305,9 +360,10 @@ const downloadAllProduct = asyncHandler(async (req, res) => {
       { sell_price: { $lte: maxprice } },
     ],
   })
+    .select('-discount -createdAt')
     .sort({ createdAt: -1 })
-    .populate("category subcategory specialcategory size countInStock");
- 
+    .populate("category subcategory size countInStock");
+  
   res.json({ products });
 });
 
@@ -476,5 +532,6 @@ module.exports = {
   getProductInventory,
   mostOrderedProducts,
   getNewArrivalsProducts,
-  downloadAllProduct
+  downloadAllProduct,
+  getAllProductsByStockSorting
 };
