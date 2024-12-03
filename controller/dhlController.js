@@ -492,7 +492,11 @@ const generateTokenInInterval = asyncHandler(async (req, res) => {
 
 const scheduleDHLTokenJob = asyncHandler(async () => {
   schedule.scheduleJob('0 */12 * * *', async function () {
-    await generateTokenInInterval();
+    try {
+      await generateTokenInInterval();
+    } catch (error) {
+      console.error('Error occurred during token generation:', error);
+    }
   })
 });
 
