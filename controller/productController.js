@@ -163,33 +163,36 @@ const deleteProduct = asyncHandler(async (req, res) => {
   }
   
 });
+
 const getAllProduct = asyncHandler(async (req, res) => {
   const {
     category,
     subcategory,
     size,
     specialcategory,
-    price,
     ratings,
     min,
     max,
   } = req.query;
 
-  const minprice = price ? min : 0;
-  const maxprice = price ? max : 250000000;
+  const minprice = min && !isNaN(Number(min)) ? Number(min) : 0;
+  const maxprice = max && !isNaN(Number(max)) ? Number(max) : 250000000;
+
   const filter = {
     category,
     size,
     subcategory,
     specialcategory,
-
     rating: ratings,
   };
+
   const asArray = Object.entries(filter);
-  const filtered = asArray.filter(([key, value]) => value);
+  const filtered = asArray.filter(([key, value]) => value); 
   const justStrings = Object.fromEntries(filtered);
+
   const pageSize = 20;
   const page = Number(req.query.pageNumber) || 1;
+
   const count = await Product.countDocuments({
     $and: [
       justStrings,
@@ -197,10 +200,10 @@ const getAllProduct = asyncHandler(async (req, res) => {
       { sell_price: { $lte: maxprice } },
     ],
   });
-  var pageCount = Math.floor(count / pageSize);
-  if (count % pageSize !== 0) {
-    pageCount = pageCount + 1;
-  }
+
+
+  var pageCount = Math.ceil(count / pageSize);
+
 
   const products = await Product.find({
     $and: [
@@ -213,7 +216,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .skip(pageSize * (page - 1))
     .populate("category subcategory specialcategory size countInStock");
- 
+
   res.json({ products, pageCount });
 });
 
