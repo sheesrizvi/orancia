@@ -490,11 +490,8 @@ const generateTokenInInterval = asyncHandler(async (req, res) => {
 
 })
 
-const scheduleDHLTokenJob = asyncHandler(() => {
-  const rule = new schedule.RecurrenceRule();
-  rule.hour = 0;
-  rule.minute = 0;
-  schedule.scheduleJob(rule, async function () {
+const scheduleDHLTokenJob = asyncHandler(async () => {
+  schedule.scheduleJob('0 */12 * * *', async function () {
     await generateTokenInInterval();
   })
 });
