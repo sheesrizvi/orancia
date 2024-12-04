@@ -1,5 +1,5 @@
 const express = require("express");
-const { admin } = require("../middleware/authmiddleware");
+
 
 const {
   deleteProduct,
@@ -15,7 +15,7 @@ const {
   getNewArrivalsProducts,
   downloadAllProduct,
   getAllProductsByStockSorting
-} = require("../controller/productController");
+} = require("../controller/productController.js");
 const {
   createInput,
   getAllInput,

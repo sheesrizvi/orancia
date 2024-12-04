@@ -6,7 +6,7 @@ const router = express.Router();
 
 const multerS3 = require("multer-s3");
 
-const { admin, auth } = require("../middleware/authmiddleware");
+const { admin } = require('../middleware/authMiddleware.js') 
 const { S3Client } = require("@aws-sdk/client-s3");
 const { DeleteObjectCommand } = require("@aws-sdk/client-s3");
 

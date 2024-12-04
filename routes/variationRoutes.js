@@ -1,5 +1,4 @@
 const express = require("express");
-const { admin } = require("../middleware/authmiddleware");
 const {
   createCategory,
   getAllCategory,
@@ -30,7 +29,7 @@ const {
   getBannerPaginationApplied,
   searchCoupons,
   updateSize,
-} = require("../controller/variationController");
+} = require("../controller/variationController.js");
 const {
   createCoupon,
   getCoupon,
@@ -39,7 +38,7 @@ const {
   couponUsed,
   getCouponPaginationApplied,
   updateCoupon,
-} = require("../controller/couponController");
+} = require("../controller/couponController.js");
 const router = express.Router();
 
 router.route("/category/create").post(createCategory);

@@ -22,7 +22,7 @@ const {
   getPendingOrdersForDownload,
   getOrdersForDownload,
    getFailedOnlineOrdersForDownload
-} = require("../controller/orderController");
+} = require("../controller/orderController.js");
 
 const router = express.Router();
 

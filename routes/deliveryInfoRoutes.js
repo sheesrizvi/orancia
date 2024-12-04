@@ -1,5 +1,5 @@
 const express = require('express')
-const { generateAccessToken, getAccessToken, checkDeliveryExists, fetchWayBill, cancelWayBill, updateWayBill, trackShipment, cancelWayBillByOrderNo, addWayBillInOrder } = require('../controller/dhlController')
+const { generateAccessToken, getAccessToken, checkDeliveryExists, fetchWayBill, cancelWayBill, updateWayBill, trackShipment, cancelWayBillByOrderNo, addWayBillInOrder } = require('../controller/dhlController.js')
 const router = express.Router()
 
 router.get('/generate-dhl-token', generateAccessToken)

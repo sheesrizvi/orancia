@@ -1,6 +1,5 @@
 const express = require("express");
-const { admin } = require("../middleware/authmiddleware");
-const { dashboardData, topCustomers, topSellingProducts, searchTopSellingProducts, searchTopCustomers, topCustomersForDownload, topSellingProductsForDownload } = require("../controller/reportController");
+const { dashboardData, topCustomers, topSellingProducts, searchTopSellingProducts, searchTopCustomers, topCustomersForDownload, topSellingProductsForDownload } = require("../controller/reportController.js");
 
 const router = express.Router();
 

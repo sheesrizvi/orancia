@@ -1,11 +1,9 @@
 const express = require("express");
-
-const { admin } = require("../middleware/authmiddleware");
 const {
   registerUser,
   authUser,
   saveShippingAddress,
-} = require("../controller/userController");
+} = require("../controller/userController.js");
 const router = express.Router();
 
 router.route("/register").post(registerUser);
