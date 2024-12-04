@@ -1,9 +1,9 @@
 const asyncHandler = require("express-async-handler");
 const generateToken = require("../utils/generateToken.js");
-const Gate = require("../model/gateAdmin.js");
-const Finance = require("../model/financeAdminModel.js");
-const InventoryAdmin = require("../model/inventoryAdminModel.js");
-const SeoAdmin = require("../model/seoAdminModel.js");
+const Gate = require("../models/gateAdmin.js");
+const Finance = require("../models/financeAdminModel.js");
+const InventoryAdmin = require("../models/inventoryAdminModel.js");
+const SeoAdmin = require("../models/seoAdminModel.js");
 
 
 
@@ -25,6 +25,7 @@ const authGate= asyncHandler(async (req, res) => {
     throw new Error("Invalid email or password");
   }
 });
+
 const registerGate = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -121,6 +122,7 @@ const authFinance= asyncHandler(async (req, res) => {
       throw new Error("Invalid email or password");
     }
   });
+  
   const registerInventory = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
   
@@ -198,6 +200,7 @@ const authFinance= asyncHandler(async (req, res) => {
       throw new Error("Invalid user data");
     }
   });
+
 
 module.exports = {
   authGate,

@@ -14,6 +14,7 @@ const createfeatured = asyncHandler(async (req, res) => {
     throw new Error("Error");
   }
 });
+
 const updatefeatured = asyncHandler(async (req, res) => {
   const { products } = req.body;
   const orderAgain = FeaturedProduct.findById(id);
