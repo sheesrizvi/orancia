@@ -560,7 +560,7 @@ const addItemInRecentlyViewed = asyncHandler(async (req, res) => {
 
 
 const getRecentlyViewedItems = asyncHandler(async (req, res) => {
-  const {userId, pageNumber = 1, pageSize = 20 } = req.query
+  const {userId } = req.query
 
   const recentlyViewedItems = await RecentlyViewedProduct.find({
     user: userId
@@ -584,7 +584,7 @@ const getRecentlyViewedItems = asyncHandler(async (req, res) => {
     }
   ).sort({
     viewAt: -1
-   }).skip((pageNumber - 1) * pageSize).limit(pageSize)
+   })
 
    res.status(200).send({ recentlyViewedItems })
 })
