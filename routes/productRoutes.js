@@ -14,7 +14,9 @@ const {
   mostOrderedProducts,
   getNewArrivalsProducts,
   downloadAllProduct,
-  getAllProductsByStockSorting
+  getAllProductsByStockSorting,
+  addItemInRecentlyViewed,
+  getRecentlyViewedItems
 } = require("../controller/productController.js");
 const {
   createInput,
@@ -38,6 +40,8 @@ router.route("/search-product").get(searchProducts);
 router.route("/delete-inventory").delete(deleteInput)
 router.route("/most-ordered-products").get(mostOrderedProducts)
 router.route('/get-new-arrival').get(getNewArrivalsProducts)
+router.route('/add-item-in-recently-viewed').post(addItemInRecentlyViewed)
+router.route('/get-recently-viewed-item').get(getRecentlyViewedItems)
 
 // delete
 router.route("/delete").delete(deleteProduct);

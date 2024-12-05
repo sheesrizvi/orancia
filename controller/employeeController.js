@@ -122,7 +122,7 @@ const authFinance= asyncHandler(async (req, res) => {
       throw new Error("Invalid email or password");
     }
   });
-  
+
   const registerInventory = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
   

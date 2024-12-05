@@ -1,7 +1,7 @@
 const path = require("path");
 const express = require("express");
 const multer = require("multer");
-
+const asyncHandler = require('express-async-handler')
 const router = express.Router();
 
 const multerS3 = require("multer-s3");
@@ -62,18 +62,24 @@ router.post(
   }
 );
 
-router.delete("/deleteImage", admin, async (req, res) => {
+router.delete("/deleteImage", asyncHandler(async (req, res) => {
   let image = req.query.image;
-   image = Array.isArray(image) ? image : [image];
-  image.map(async (file) => {
-    const fileName = file.split("//")[1].split("/")[1];
+  image = Array.isArray(image) ? image : [image];
 
-    const command = new DeleteObjectCommand({
-      Bucket: process.env.AWS_BUCKET,
-      Key: fileName,
-    });
-    const response = await s3.send(command);
-  });
-});
+  try {
+      for (const file of image) {
+          const fileName = file.split("//")[1].split("/")[1];
+
+          const command = new DeleteObjectCommand({
+              Bucket: process.env.AWS_BUCKET,
+              Key: fileName,
+          });
+          await s3.send(command); 
+      }
+      res.status(200).send({ message: 'Deletion successful' });
+  } catch (e) {
+      res.status(400).send({ message: 'Deletion Failed', error: e });
+  }
+}));
 
 module.exports = router;

@@ -7,6 +7,7 @@ const {
 const Product = require("../models/productModel");
 const Inventory = require("../models/inventoryModel");
 const Order = require("../models/orderModel");
+const RecentlyViewedProduct = require("../models/recentlyViewedProductModel");
 
 
 const config = {
@@ -523,6 +524,72 @@ const getNewArrivalsProducts = asyncHandler(async (req, res) => {
     res.status(200).send({message: 'New Arrival Products First', products, pageCount})
 })
 
+const addItemInRecentlyViewed = asyncHandler(async (req, res) => {
+  const { userId, productId } = req.body;
+
+  if (!userId || !productId) {
+    return res.status(400).send({ message: 'User and Product are required' });
+  }
+
+  const existingItem = await RecentlyViewedProduct.findOne({ user: userId, product: productId });
+
+  if (existingItem) {
+    await RecentlyViewedProduct.findOneAndUpdate(
+      { _id: existingItem._id },
+      { $set: { viewAt: Date.now() } }
+    );
+  } else {
+    await RecentlyViewedProduct.create({
+      user: userId,
+      product: productId
+    });
+    
+    const recentlyViewedItems = await RecentlyViewedProduct.find({ user: userId }).sort({ viewAt: -1 });
+    if (recentlyViewedItems.length > 20) {
+      const itemsToRemove = recentlyViewedItems.slice(20);
+      const idsToRemove = itemsToRemove.map((item) => item._id);
+     
+      await RecentlyViewedProduct.deleteMany({ _id: { $in: idsToRemove } });
+    }
+  }
+
+  res.status(200).send({
+    message: 'Product successfully added to recently viewed items'
+  });
+});
+
+
+const getRecentlyViewedItems = asyncHandler(async (req, res) => {
+  const {userId, pageNumber = 1, pageSize = 20 } = req.query
+
+  const recentlyViewedItems = await RecentlyViewedProduct.find({
+    user: userId
+  }).populate(
+    {
+      path: 'product',
+      populate: [
+        {
+          path: 'category'
+        },
+        {
+          path: 'subcategory'
+        },
+        {
+          path: 'size'
+        },
+        {
+          path: 'countInStock'
+        }
+      ]
+    }
+  ).sort({
+    viewAt: -1
+   }).skip((pageNumber - 1) * pageSize).limit(pageSize)
+
+   res.status(200).send({ recentlyViewedItems })
+})
+
+
 module.exports = {
   createProduct,
   updateProduct,
@@ -536,5 +603,7 @@ module.exports = {
   mostOrderedProducts,
   getNewArrivalsProducts,
   downloadAllProduct,
-  getAllProductsByStockSorting
+  getAllProductsByStockSorting,
+  addItemInRecentlyViewed,
+  getRecentlyViewedItems
 };
