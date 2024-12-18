@@ -44,6 +44,9 @@ const createProduct = asyncHandler(async (req, res) => {
     size,
     notes,
     ingredients,
+    metaTitle,
+    metaDescription,
+    metaKeywords
   } = req.body;
 
   const inputStock = await Inventory.create({
@@ -71,6 +74,9 @@ const createProduct = asyncHandler(async (req, res) => {
     size,
     notes,
     ingredients,
+    metaTitle,
+    metaDescription,
+    metaKeywords
   });
 
   if (ecomProduct) {
@@ -104,13 +110,17 @@ const updateProduct = asyncHandler(async (req, res) => {
     size,
     notes,
     ingredients,
+    metaTitle,
+    metaDescription,
+    metaKeywords
   } = req.body;
   const ecomProduct = await Product.findById(sku);
   
   if (ecomProduct) {
     ecomProduct.name = name || ecomProduct.name;
     ecomProduct.description = description || ecomProduct.description;
-    ecomProduct.image = Array.isArray(image) && image.length > 0 ? image : ecomProduct.image;
+    ecomProduct.image = Array.isArray(image) && image.length > 0 ? [...ecomProduct.image, ...image]
+    : ecomProduct.image
     ecomProduct.category = category || ecomProduct.category;
     ecomProduct.subcategory = subcategory || ecomProduct.subcategory;
     ecomProduct.specialcategory = specialcategory || ecomProduct.specialcategory;
@@ -134,6 +144,10 @@ const updateProduct = asyncHandler(async (req, res) => {
     ecomProduct.size = size || ecomProduct.size;
     ecomProduct.ingredients = ingredients || ecomProduct.ingredients;
     ecomProduct.notes = notes || ecomProduct.notes;
+    ecomProduct.metaTitle = metaTitle || ecomProduct.metaTitle
+    ecomProduct.metaDescription = metaDescription || ecomProduct.metaDescription
+    ecomProduct.metaKeywords = metaKeywords || ecomProduct.metaKeywords
+
     const updatedProduct = await ecomProduct.save();
     res.json(updatedProduct);
   } else {
@@ -590,6 +604,140 @@ const getRecentlyViewedItems = asyncHandler(async (req, res) => {
 })
 
 
+const toggleBestSellerProducts = asyncHandler(async (req, res) => {
+  const { productId } = req.body
+  
+  const product = await Product.findOne({ _id: productId })
+ 
+  if(!product) {
+    return res.status(400).send({ message: 'Product not found' })
+  }
+
+  product.bestSeller = !product.bestSeller
+ 
+  await product.save()
+
+  res.status(200).send({ message: 'BestSeller Updated Successfully' })
+})
+
+const toggleNewArrivalProducts = asyncHandler(async (req, res) => {
+  const { productId } = req.body
+  const product = await Product.findOne({ _id: productId })
+  
+  if(!product) {
+    return res.status(400).send({ message: 'Product not found' })
+  }
+  product.newArrival = !product.newArrival
+  
+  await product.save()
+
+  res.status(200).send({ message: 'BestSeller Updated Successfully' })
+})
+
+const shareNewArrivalProducts = asyncHandler(async (req, res) => {
+  const { pageNumber = 1, pageSize = 20 } = req.query
+
+  const products = await Product.find({ newArrival: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber -1) * pageSize).limit(pageSize)
+
+  if(!products || products.length === 0) {
+    return res.status(400).send({ messge: 'No New Arrival Products Found' })
+  }
+
+  const totalDocuments = await Product.countDocuments({newArrival: true})
+  const pageCount = Math.ceil(totalDocuments/pageSize)
+
+  res.status(200).send({ products, pageCount })
+  
+})
+
+const shareBestSellerProducts = asyncHandler(async (req, res) => {
+  const { pageNumber = 1, pageSize = 20 } = req.query
+
+  const products = await Product.find({ bestSeller: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber -1) * pageSize).limit(pageSize)
+
+  if(!products || products.length === 0) {
+    return res.status(400).send({ messge: 'No New Arrival Products Found' })
+  }
+
+  const totalDocuments = await Product.countDocuments({bestSeller: true})
+  const pageCount = Math.ceil(totalDocuments/pageSize)
+
+  res.status(200).send({ products, pageCount })
+})
+
+const searchNewArrivalProducts = asyncHandler(async (req, res) => {
+  
+  const products = await Product.find({
+    $and: [
+      { 
+        $or: [
+          { name: { $regex: req.query.Query, $options: "i" } },
+          { details: { $regex: req.query.Query, $options: "i" } },
+          { description: { $regex: req.query.Query, $options: "i" } },
+          { ingredients: { $regex: req.query.Query, $options: "i" } },
+          { category: { $regex: req.query.Query, $options: "i" } },
+        ],
+      },
+      { bestSeller: true }
+    ]
+   
+  }).populate("category subcategory specialcategory size countInStock");;
+  
+  if (!products || products.length === 0) {
+    return res.status(404).json({ message: "No products found" });
+  }
+  
+  res.status(200).json(products);
+  
+})
+
+
+const searchBestSellerProducts = asyncHandler(async (req, res) => {
+  
+  const products = await Product.find({
+    $and: [
+      { 
+        $or: [
+          { name: { $regex: req.query.Query, $options: "i" } },
+          { details: { $regex: req.query.Query, $options: "i" } },
+          { description: { $regex: req.query.Query, $options: "i" } },
+          { ingredients: { $regex: req.query.Query, $options: "i" } },
+          { category: { $regex: req.query.Query, $options: "i" } },
+        ],
+      },
+      { newArrival: true }
+    ]
+   
+  }).populate("category subcategory specialcategory size countInStock");;
+  
+  if (!products || products.length === 0) {
+    return res.status(404).json({ message: "No products found" });
+  }
+  
+  res.status(200).json(products);
+  
+})
+
+const bestSellerDownload = asyncHandler(async (req, res) => {
+  const products = await Product.find({ bestSeller: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber -1) * pageSize).limit(pageSize)
+
+  if(!products || products.length === 0) {
+    return res.status(400).send({ messge: 'No New Arrival Products Found' })
+  }
+
+  res.status(200).send({products})
+})
+
+const newArrivalDownload = asyncHandler(async (req, res) => {
+  const products = await Product.find({ newArrival: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber -1) * pageSize).limit(pageSize)
+
+  if(!products || products.length === 0) {
+    return res.status(400).send({ messge: 'No New Arrival Products Found' })
+  }
+
+  res.status(200).send({products})
+})
+
 module.exports = {
   createProduct,
   updateProduct,
@@ -605,5 +753,13 @@ module.exports = {
   downloadAllProduct,
   getAllProductsByStockSorting,
   addItemInRecentlyViewed,
-  getRecentlyViewedItems
+  getRecentlyViewedItems,
+  toggleBestSellerProducts,
+  toggleNewArrivalProducts,
+  shareNewArrivalProducts,
+  shareBestSellerProducts,
+  searchBestSellerProducts,
+  searchNewArrivalProducts,
+  bestSellerDownload,
+  newArrivalDownload
 };

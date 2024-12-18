@@ -16,7 +16,15 @@ const {
   downloadAllProduct,
   getAllProductsByStockSorting,
   addItemInRecentlyViewed,
-  getRecentlyViewedItems
+  getRecentlyViewedItems,
+  toggleBestSellerProducts,
+  toggleNewArrivalProducts,
+  shareBestSellerProducts,
+  shareNewArrivalProducts,
+  searchBestSellerProducts,
+  searchNewArrivalProducts,
+  bestSellerDownload,
+  newArrivalDownload
 } = require("../controller/productController.js");
 const {
   createInput,
@@ -42,6 +50,14 @@ router.route("/most-ordered-products").get(mostOrderedProducts)
 router.route('/get-new-arrival').get(getNewArrivalsProducts)
 router.route('/add-item-in-recently-viewed').post(addItemInRecentlyViewed)
 router.route('/get-recently-viewed-item').get(getRecentlyViewedItems)
+router.route('/toggle-best-seller-products').post(toggleBestSellerProducts)
+router.route('/toggle-new-arrival-products').post(toggleNewArrivalProducts)
+router.route('/share-best-seller-products').get(shareBestSellerProducts)
+router.route('/share-new-arrival-products').get(shareNewArrivalProducts)
+router.route('/search-best-seller-products').get(searchBestSellerProducts)
+router.route('/search-new-arrival-products').get(searchNewArrivalProducts)
+router.route('/best-seller-download').get(bestSellerDownload)
+router.route('/new-arrival-download').get(newArrivalDownload)
 
 // delete
 router.route("/delete").delete(deleteProduct);

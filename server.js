@@ -11,6 +11,7 @@ const blogRoutes = require("./routes/blogRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const deliveryInfoRoutes = require("./routes/deliveryInfoRoutes")
 const reportRoutes = require("./routes/reportRoutes")
+const faqRoutes = require('./routes/faqRoutes')
 
 const cors = require("cors");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
@@ -35,6 +36,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/delivery", deliveryInfoRoutes)
 app.use("/api/reports", reportRoutes)
+app.use("/api/faqs", faqRoutes)
 
 app.use(notFound)
 app.use(errorHandler)

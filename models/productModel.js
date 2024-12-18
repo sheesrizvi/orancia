@@ -105,6 +105,23 @@ const productSchema = mongoose.Schema(
     notes: {
       type: String,
     },
+    metaTitle: {
+      type: String
+    },
+    metaDescription: {
+      type: String
+    },
+    metaKeywords: {
+      type: String
+    },
+    bestSeller: {
+      type: Boolean,
+      default: false
+    },
+    newArrival: {
+     type: Boolean,
+     default: false
+    }
   },
   {
     timestamps: true,
