@@ -11,6 +11,7 @@ const SpecialCategory = require("../models/specialCategory");
 const Size = require("../models/sizeModel");
 const Banner = require("../models/carouselModel");
 const Coupon = require("../models/couponModel");
+const BottomBanner = require("../models/bottomBannerModel");
 
 const config = {
   region: process.env.AWS_BUCKET_REGION,
@@ -509,7 +510,40 @@ const searchCoupons = asyncHandler(async (req, res) => {
 });
 
 
+const createBottomBanner = asyncHandler(async (req, res) => {
+  const { title, image } = req.body
 
+  if(!title || !image) {
+    return res.status(400).send({ message: 'No Title or Image Found' })
+  }
+
+  await BottomBanner.create({
+    title,
+    image
+  })
+
+  res.status(200).send({ message: 'Bottom Banner created successfully' })
+})
+
+const listBottomBanners = asyncHandler(async (req, res) => {
+
+  const banners = await BottomBanner.find({})
+  if(!banners) {
+    return res.status(400).send({ message: 'Banner not found' })
+  }
+  res.status(200).send({ message: 'Bottom Banner created successfully', banners })
+})
+
+const deleteBottomBanner = asyncHandler(async (req, res) => {
+    const { id } = req.query
+    console.log(req.query)
+    const bottomBanner =  await BottomBanner.findOneAndDelete({ _id: id })
+    if(!bottomBanner) {
+      return res.status(400).send({ message: 'Banner not found' })
+    }
+
+    res.status(200).send({ banner: bottomBanner })
+})
 
 module.exports = {
   createBanner,
@@ -540,5 +574,8 @@ module.exports = {
   searchSpecialCategory,
   getAllSizePaginationApplied,
   getBannerPaginationApplied,
-  searchCoupons
+  searchCoupons,
+  createBottomBanner,
+  listBottomBanners,
+  deleteBottomBanner
 };

@@ -29,6 +29,9 @@ const {
   getBannerPaginationApplied,
   searchCoupons,
   updateSize,
+  createBottomBanner,
+  deleteBottomBanner,
+  listBottomBanners,
 } = require("../controller/variationController.js");
 const {
   createCoupon,
@@ -79,5 +82,10 @@ router.route("/specialcategory/delete").delete(deleteSpecialCategory);
 router.route("/banner/delete").delete(deleteBanner);
 router.route("/size/delete").delete(deleteSize);
 router.route("/coupon/delete").delete(deleteCoupon);
+
+
+router.route('/bottombanner/create').post(createBottomBanner)
+router.route('/bottombanner/delete').delete(deleteBottomBanner)
+router.route('/bottombanner/list').get(listBottomBanners)
 
 module.exports = router;
