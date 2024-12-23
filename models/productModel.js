@@ -111,9 +111,6 @@ const productSchema = mongoose.Schema(
     metaDescription: {
       type: String
     },
-    metaKeywords: {
-      type: String
-    },
     bestSeller: {
       type: Boolean,
       default: false

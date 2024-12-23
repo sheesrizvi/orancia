@@ -45,8 +45,7 @@ const createProduct = asyncHandler(async (req, res) => {
     notes,
     ingredients,
     metaTitle,
-    metaDescription,
-    metaKeywords
+    metaDescription
   } = req.body;
 
   const inputStock = await Inventory.create({
@@ -76,7 +75,6 @@ const createProduct = asyncHandler(async (req, res) => {
     ingredients,
     metaTitle,
     metaDescription,
-    metaKeywords
   });
 
   if (ecomProduct) {
@@ -112,7 +110,6 @@ const updateProduct = asyncHandler(async (req, res) => {
     ingredients,
     metaTitle,
     metaDescription,
-    metaKeywords
   } = req.body;
   const ecomProduct = await Product.findById(sku);
   
@@ -129,6 +126,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     ecomProduct.cost_price = cost_price || ecomProduct.cost_price;
     ecomProduct.sell_price = sell_price || ecomProduct.sell_price;
     ecomProduct.discount = discount || ecomProduct.discount;
+    ecomProduct.groupId = groupId || ecomProduct.groupId
+
     if(countInStock) {
     
      const res =  await Inventory.findOneAndUpdate({product: ecomProduct._id}, {
@@ -146,7 +145,6 @@ const updateProduct = asyncHandler(async (req, res) => {
     ecomProduct.notes = notes || ecomProduct.notes;
     ecomProduct.metaTitle = metaTitle || ecomProduct.metaTitle
     ecomProduct.metaDescription = metaDescription || ecomProduct.metaDescription
-    ecomProduct.metaKeywords = metaKeywords || ecomProduct.metaKeywords
 
     const updatedProduct = await ecomProduct.save();
     res.json(updatedProduct);
@@ -154,7 +152,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Product not found");
   }
-});
+})
+
 const deleteProduct = asyncHandler(async (req, res) => {
   try {
     const subid = req.query.id;

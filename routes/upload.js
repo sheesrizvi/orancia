@@ -56,7 +56,7 @@ router.post(
   upload.single("image"),
   async (req, res) => {
     const result = req.file;
-   
+    
     //define what to do if result is empty
     res.send(`${result.location}`);
   }
@@ -74,10 +74,12 @@ router.delete("/deleteImage", asyncHandler(async (req, res) => {
               Bucket: process.env.AWS_BUCKET,
               Key: fileName,
           });
-          await s3.send(command); 
+          const result = await s3.send(command)
+          
       }
       res.status(200).send({ message: 'Deletion successful' });
   } catch (e) {
+     
       res.status(400).send({ message: 'Deletion Failed', error: e });
   }
 }));

@@ -36,6 +36,7 @@ const generateAccessToken = asyncHandler(async (req, res) => {
 const getAccessToken = asyncHandler(async (req, res) => {
 
   const tokenDocument = await DHLAccessToken.findOne({})
+  
   let token
   if (tokenDocument) {
     token = tokenDocument.token
@@ -364,8 +365,8 @@ const generateWayBill = asyncHandler(async (order) => {
       noOfDCGiven: 0
     },
     Shipper: {
-      CustomerAddress1: "Test Cust Addr1",
-      CustomerAddress2: "Test Cust Addr2",
+      CustomerAddress1: "Corp Off: D-5/614, Vikas Khand",
+      CustomerAddress2: "Gomti Nagar, Lucknow-226010",
       CustomerAddress3: "Test Cust Addr3",
       CustomerAddressinfo: "",
       CustomerBusinessPartyTypeCode: "",
