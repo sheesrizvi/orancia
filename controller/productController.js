@@ -160,15 +160,16 @@ const deleteProduct = asyncHandler(async (req, res) => {
     const sub = await Product.findById(subid);
   
     const f1 = sub.image;
-    // f1.map(async (file) => {
-    //   const fileName = file.split("//")[1].split("/")[1];
+    f1.map(async (file) => {
+      const fileName = file.split("//")[1].split("/")[1];
   
-    //   const command = new DeleteObjectCommand({
-    //     Bucket: process.env.AWS_BUCKET,
-    //     Key: fileName,
-    //   });
-    //   const response = await s3.send(command);
-    // });
+      const command = new DeleteObjectCommand({
+        Bucket: process.env.AWS_BUCKET,
+        Key: fileName,
+      });
+      const response = await s3.send(command);
+     
+    });
     await Inventory.deleteOne({ product: req.query.id });
     await Product.deleteOne({ _id: req.query.id });
     res.json("deleted");
@@ -737,6 +738,40 @@ const newArrivalDownload = asyncHandler(async (req, res) => {
   res.status(200).send({products})
 })
 
+const deleteProductImage = asyncHandler(async (req, res) => {
+  const { imageURL, productId } = req.query
+
+  const product = await Product.findById(productId)
+  
+  if(!product) {
+    return res.status(400).send({ message: 'Product not found' })
+  }
+  
+  if(!product.image || product.image.length === 0 || product.image.length === 1) {
+    return res.status(400).send({ message: 'Product has not much image' })
+  }
+
+  product.image = product.image.filter(img => img !== imageURL)
+  await product.save()
+
+
+      let image = imageURL;
+      image = Array.isArray(image) ? image : [image];
+
+      for (const file of image) {
+          const fileName = file.split("//")[1].split("/")[1];
+
+          const command = new DeleteObjectCommand({
+              Bucket: process.env.AWS_BUCKET,
+              Key: fileName,
+          });
+          const result = await s3.send(command)
+          
+      }
+      res.status(200).send({ message: 'Deletion successful' });
+  
+})
+
 module.exports = {
   createProduct,
   updateProduct,
@@ -760,5 +795,6 @@ module.exports = {
   searchBestSellerProducts,
   searchNewArrivalProducts,
   bestSellerDownload,
-  newArrivalDownload
+  newArrivalDownload,
+  deleteProductImage
 };

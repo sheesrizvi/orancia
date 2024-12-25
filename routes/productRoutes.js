@@ -24,7 +24,8 @@ const {
   searchBestSellerProducts,
   searchNewArrivalProducts,
   bestSellerDownload,
-  newArrivalDownload
+  newArrivalDownload,
+  deleteProductImage
 } = require("../controller/productController.js");
 const {
   createInput,
@@ -58,6 +59,7 @@ router.route('/search-best-seller-products').get(searchBestSellerProducts)
 router.route('/search-new-arrival-products').get(searchNewArrivalProducts)
 router.route('/best-seller-download').get(bestSellerDownload)
 router.route('/new-arrival-download').get(newArrivalDownload)
+router.route('/delete-product-image').delete(deleteProductImage)
 
 // delete
 router.route("/delete").delete(deleteProduct);
