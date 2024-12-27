@@ -1,28 +1,47 @@
 const mongoose = require('mongoose');
 
+
 const faqSchema = new mongoose.Schema({
-  title: {
-    type: String
+  coreTitle: {
+    type: String,
+    required: true,
+    trim: true,
   },
-  faqs: [
+  sections: [
     {
-      question: {
+      title: {
         type: String,
         required: true,
         trim: true,
       },
-      answer: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-      isActive: {
-        type: Boolean,
-        default: true, 
-      },
+      faqs: [
+        {
+          question: {
+            type: String,
+            required: true,
+            trim: true,
+          },
+          answer: {
+            type: String,
+            required: true,
+            trim: true,
+          },
+          steps: [
+            {
+              type: String
+            },
+          ],
+          isActive: {
+            type: Boolean,
+            default: true,
+          },
+        },
+      ],
     },
   ],
 }, { timestamps: true });
+
+
 
 faqSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
