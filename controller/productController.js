@@ -86,7 +86,7 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
-  
+
   const {
     groupId,
     sku,
@@ -112,30 +112,30 @@ const updateProduct = asyncHandler(async (req, res) => {
     metaDescription,
   } = req.body;
   const ecomProduct = await Product.findById(sku);
-  
+
   if (ecomProduct) {
     ecomProduct.name = name || ecomProduct.name;
     ecomProduct.description = description || ecomProduct.description;
     ecomProduct.image = Array.isArray(image) && image.length > 0 ? [...ecomProduct.image, ...image]
-    : ecomProduct.image
+      : ecomProduct.image
     ecomProduct.category = category || ecomProduct.category;
     ecomProduct.subcategory = subcategory || ecomProduct.subcategory;
     ecomProduct.specialcategory = specialcategory || ecomProduct.specialcategory;
-   // ecomProduct.manufacturer = manufacturer || ecomProduct.manufacturer;
+    // ecomProduct.manufacturer = manufacturer || ecomProduct.manufacturer;
     ecomProduct.details = details || ecomProduct.details;
     ecomProduct.cost_price = cost_price || ecomProduct.cost_price;
     ecomProduct.sell_price = sell_price || ecomProduct.sell_price;
     ecomProduct.discount = discount || ecomProduct.discount;
     ecomProduct.groupId = groupId || ecomProduct.groupId
 
-    if(countInStock) {
-    
-     const res =  await Inventory.findOneAndUpdate({product: ecomProduct._id}, {
+    if (countInStock) {
+
+      const res = await Inventory.findOneAndUpdate({ product: ecomProduct._id }, {
         qty: countInStock
       })
-     
+
     }
-   
+
     ecomProduct.tax = tax || ecomProduct.tax;
     ecomProduct.shelflife = shelflife || ecomProduct.shelflife;
     ecomProduct.expiry = expiry || ecomProduct.expiry;
@@ -158,11 +158,11 @@ const deleteProduct = asyncHandler(async (req, res) => {
   try {
     const subid = req.query.id;
     const sub = await Product.findById(subid);
-  
+
     const f1 = sub.image;
     // f1.map(async (file) => {
     //   const fileName = file.split("//")[1].split("/")[1];
-  
+
     //   const command = new DeleteObjectCommand({
     //     Bucket: process.env.AWS_BUCKET,
     //     Key: fileName,
@@ -172,10 +172,10 @@ const deleteProduct = asyncHandler(async (req, res) => {
     await Inventory.deleteOne({ product: req.query.id });
     await Product.deleteOne({ _id: req.query.id });
     res.json("deleted");
-  } catch(e) {
+  } catch (e) {
     throw new Error(e.message)
   }
-  
+
 });
 
 const getAllProduct = asyncHandler(async (req, res) => {
@@ -201,7 +201,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
   };
 
   const asArray = Object.entries(filter);
-  const filtered = asArray.filter(([key, value]) => value); 
+  const filtered = asArray.filter(([key, value]) => value);
   const justStrings = Object.fromEntries(filtered);
 
   const pageSize = 20;
@@ -284,7 +284,7 @@ const getAllProductsByStockSorting = asyncHandler(async (req, res) => {
     .sort({ 'countInStock.qty': 1 })
     .skip(pageSize * (page - 1))
     .populate("category subcategory specialcategory size countInStock");
- 
+
   res.json({ products, pageCount });
 });
 
@@ -380,7 +380,7 @@ const downloadAllProduct = asyncHandler(async (req, res) => {
     .select('-discount -createdAt')
     .sort({ createdAt: -1 })
     .populate("category subcategory size countInStock");
-  
+
   res.json({ products });
 });
 
@@ -452,7 +452,7 @@ const createProductReview = asyncHandler(async (req, res) => {
   }
 });
 const searchProducts = asyncHandler(async (req, res) => {
-  
+
   const products = await Product.find({
     $or: [
       { name: { $regex: req.query.Query, $options: "i" } },
@@ -462,19 +462,19 @@ const searchProducts = asyncHandler(async (req, res) => {
       { category: { $regex: req.query.Query, $options: "i" } },
     ],
   }).populate("category subcategory specialcategory size countInStock");;
-  
+
   if (!products || products.length === 0) {
     return res.status(404).json({ message: "No products found" });
   }
-  
+
   res.status(200).json(products);
-  
+
 });
 
-const mostOrderedProducts = asyncHandler (async (req, res) => {
+const mostOrderedProducts = asyncHandler(async (req, res) => {
   const pageNumber = req.query.pageNumber || 1
   const pageSize = req.query.pageSize || 20
- 
+
   const totalOrderedProducts = await Order.aggregate([
     { $unwind: "$orderItems" },
     {
@@ -482,11 +482,11 @@ const mostOrderedProducts = asyncHandler (async (req, res) => {
         _id: "$orderItems.product",
       },
     },
-    { $count: "total" } 
+    { $count: "total" }
   ]);
 
-  const totalCount = totalOrderedProducts.length > 0 ? totalOrderedProducts[0].total : 0; 
-  const pageCount = Math.ceil(totalCount / pageSize); 
+  const totalCount = totalOrderedProducts.length > 0 ? totalOrderedProducts[0].total : 0;
+  const pageCount = Math.ceil(totalCount / pageSize);
 
   const mostOrderedProducts = await Order.aggregate([
     { $unwind: "$orderItems" },
@@ -523,18 +523,18 @@ const mostOrderedProducts = asyncHandler (async (req, res) => {
 })
 
 const getNewArrivalsProducts = asyncHandler(async (req, res) => {
-    const pageNumber = req.query.pageNumber || 1
-    const pageSize = req.query.pageSize || 20
+  const pageNumber = req.query.pageNumber || 1
+  const pageSize = req.query.pageSize || 20
 
-    const products = await Product.find({}).sort({
-      createdAt: -1
-    }).populate(
-      "category subcategory specialcategory size countInStock"
-    ).skip((pageSize) * (pageNumber - 1)).limit(pageSize)
-    const totalDocuments = await Product.countDocuments({})
-    const pageCount = Math.ceil(totalDocuments/pageSize)
+  const products = await Product.find({}).sort({
+    createdAt: -1
+  }).populate(
+    "category subcategory specialcategory size countInStock"
+  ).skip((pageSize) * (pageNumber - 1)).limit(pageSize)
+  const totalDocuments = await Product.countDocuments({})
+  const pageCount = Math.ceil(totalDocuments / pageSize)
 
-    res.status(200).send({message: 'New Arrival Products First', products, pageCount})
+  res.status(200).send({ message: 'New Arrival Products First', products, pageCount })
 })
 
 const addItemInRecentlyViewed = asyncHandler(async (req, res) => {
@@ -556,12 +556,12 @@ const addItemInRecentlyViewed = asyncHandler(async (req, res) => {
       user: userId,
       product: productId
     });
-    
+
     const recentlyViewedItems = await RecentlyViewedProduct.find({ user: userId }).sort({ viewAt: -1 });
     if (recentlyViewedItems.length > 20) {
       const itemsToRemove = recentlyViewedItems.slice(20);
       const idsToRemove = itemsToRemove.map((item) => item._id);
-     
+
       await RecentlyViewedProduct.deleteMany({ _id: { $in: idsToRemove } });
     }
   }
@@ -573,7 +573,7 @@ const addItemInRecentlyViewed = asyncHandler(async (req, res) => {
 
 
 const getRecentlyViewedItems = asyncHandler(async (req, res) => {
-  const {userId } = req.query
+  const { userId } = req.query
 
   const recentlyViewedItems = await RecentlyViewedProduct.find({
     user: userId
@@ -597,23 +597,23 @@ const getRecentlyViewedItems = asyncHandler(async (req, res) => {
     }
   ).sort({
     viewAt: -1
-   })
+  })
 
-   res.status(200).send({ recentlyViewedItems })
+  res.status(200).send({ recentlyViewedItems })
 })
 
 
 const toggleBestSellerProducts = asyncHandler(async (req, res) => {
   const { productId } = req.body
-  
+
   const product = await Product.findOne({ _id: productId })
- 
-  if(!product) {
+
+  if (!product) {
     return res.status(400).send({ message: 'Product not found' })
   }
 
   product.bestSeller = !product.bestSeller
- 
+
   await product.save()
 
   res.status(200).send({ message: 'BestSeller Updated Successfully' })
@@ -622,12 +622,12 @@ const toggleBestSellerProducts = asyncHandler(async (req, res) => {
 const toggleNewArrivalProducts = asyncHandler(async (req, res) => {
   const { productId } = req.body
   const product = await Product.findOne({ _id: productId })
-  
-  if(!product) {
+
+  if (!product) {
     return res.status(400).send({ message: 'Product not found' })
   }
   product.newArrival = !product.newArrival
-  
+
   await product.save()
 
   res.status(200).send({ message: 'BestSeller Updated Successfully' })
@@ -636,39 +636,39 @@ const toggleNewArrivalProducts = asyncHandler(async (req, res) => {
 const shareNewArrivalProducts = asyncHandler(async (req, res) => {
   const { pageNumber = 1, pageSize = 20 } = req.query
 
-  const products = await Product.find({ newArrival: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber -1) * pageSize).limit(pageSize)
+  const products = await Product.find({ newArrival: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber - 1) * pageSize).limit(pageSize)
 
-  if(!products || products.length === 0) {
+  if (!products || products.length === 0) {
     return res.status(400).send({ messge: 'No New Arrival Products Found' })
   }
 
-  const totalDocuments = await Product.countDocuments({newArrival: true})
-  const pageCount = Math.ceil(totalDocuments/pageSize)
+  const totalDocuments = await Product.countDocuments({ newArrival: true })
+  const pageCount = Math.ceil(totalDocuments / pageSize)
 
   res.status(200).send({ products, pageCount })
-  
+
 })
 
 const shareBestSellerProducts = asyncHandler(async (req, res) => {
   const { pageNumber = 1, pageSize = 20 } = req.query
 
-  const products = await Product.find({ bestSeller: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber -1) * pageSize).limit(pageSize)
+  const products = await Product.find({ bestSeller: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber - 1) * pageSize).limit(pageSize)
 
-  if(!products || products.length === 0) {
+  if (!products || products.length === 0) {
     return res.status(400).send({ messge: 'No New Arrival Products Found' })
   }
 
-  const totalDocuments = await Product.countDocuments({bestSeller: true})
-  const pageCount = Math.ceil(totalDocuments/pageSize)
+  const totalDocuments = await Product.countDocuments({ bestSeller: true })
+  const pageCount = Math.ceil(totalDocuments / pageSize)
 
   res.status(200).send({ products, pageCount })
 })
 
 const searchNewArrivalProducts = asyncHandler(async (req, res) => {
-  
+
   const products = await Product.find({
     $and: [
-      { 
+      {
         $or: [
           { name: { $regex: req.query.Query, $options: "i" } },
           { details: { $regex: req.query.Query, $options: "i" } },
@@ -679,23 +679,23 @@ const searchNewArrivalProducts = asyncHandler(async (req, res) => {
       },
       { bestSeller: true }
     ]
-   
+
   }).populate("category subcategory specialcategory size countInStock");;
-  
+
   if (!products || products.length === 0) {
     return res.status(404).json({ message: "No products found" });
   }
-  
+
   res.status(200).json(products);
-  
+
 })
 
 
 const searchBestSellerProducts = asyncHandler(async (req, res) => {
-  
+
   const products = await Product.find({
     $and: [
-      { 
+      {
         $or: [
           { name: { $regex: req.query.Query, $options: "i" } },
           { details: { $regex: req.query.Query, $options: "i" } },
@@ -706,35 +706,35 @@ const searchBestSellerProducts = asyncHandler(async (req, res) => {
       },
       { newArrival: true }
     ]
-   
+
   }).populate("category subcategory specialcategory size countInStock");;
-  
+
   if (!products || products.length === 0) {
     return res.status(404).json({ message: "No products found" });
   }
-  
+
   res.status(200).json(products);
-  
+
 })
 
 const bestSellerDownload = asyncHandler(async (req, res) => {
-  const products = await Product.find({ bestSeller: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber -1) * pageSize).limit(pageSize)
+  const products = await Product.find({ bestSeller: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber - 1) * pageSize).limit(pageSize)
 
-  if(!products || products.length === 0) {
+  if (!products || products.length === 0) {
     return res.status(400).send({ messge: 'No New Arrival Products Found' })
   }
 
-  res.status(200).send({products})
+  res.status(200).send({ products })
 })
 
 const newArrivalDownload = asyncHandler(async (req, res) => {
-  const products = await Product.find({ newArrival: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber -1) * pageSize).limit(pageSize)
+  const products = await Product.find({ newArrival: true }).sort({ createdAt: -1 }).populate("category subcategory specialcategory size countInStock").skip((pageNumber - 1) * pageSize).limit(pageSize)
 
-  if(!products || products.length === 0) {
+  if (!products || products.length === 0) {
     return res.status(400).send({ messge: 'No New Arrival Products Found' })
   }
 
-  res.status(200).send({products})
+  res.status(200).send({ products })
 })
 
 module.exports = {
