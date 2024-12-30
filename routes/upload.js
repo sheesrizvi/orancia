@@ -75,11 +75,11 @@ router.delete("/deleteImage", asyncHandler(async (req, res) => {
               Key: fileName,
           });
           const result = await s3.send(command)
-          
+          console.log(result)
       }
       res.status(200).send({ message: 'Deletion successful' });
   } catch (e) {
-     
+      console.log(e)
       res.status(400).send({ message: 'Deletion Failed', error: e });
   }
 }));

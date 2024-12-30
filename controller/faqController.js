@@ -3,23 +3,21 @@ const FAQ = require('../models/faqModel.js')
 const asyncHandler = require('express-async-handler')
 
 const addFAQ = asyncHandler(async (req, res) => {
-  const { title, faqs } = req.body;
+  const { coreTitle, sections } = req.body;
   
-  if (!faqs) {
+  if (!coreTitle || !sections || sections.length === 0) {
     return res.status(400).json({ error: 'Question and answer are required.' });
   }
 
   const faqSection = await FAQ.findOne({})
   
   if(faqSection) {
-    faqSection.faqs.push(...faqs)
-    await faqSection.save()
-    return res.status(200).send({ message: 'FAQs exist' })
+    return res.status(400).send({ message: 'FAQs already exist' })
   }
 
   await FAQ.create({
-        title,
-        faqs
+        coreTitle, 
+        sections
     })
   
   res.status(201).json({ message: 'FAQ added successfully' });
@@ -36,14 +34,15 @@ const getFAQ = asyncHandler(async (req, res) => {
 })
 
 const updateFAQ = asyncHandler(asyncHandler(async (req, res) => {
-    const { id, title, faqs } = req.body
-
+    const { id, coreTitle, sections } = req.body
+ 
     const faqExist = await FAQ.findOne({ _id: id })
+
     if(!faqExist) {
         return res.status(400).send({ message: "FAQ not exist" })
     }
-    faqExist.title = title || faqExist.title
-    faqExist.faqs = faqs || faqExist.faqs
+    faqExist.coreTitle = coreTitle || faqExist.coreTitle
+    faqExist.sections = sections || faqExist.sections
 
     await faqExist.save()
 
@@ -52,7 +51,7 @@ const updateFAQ = asyncHandler(asyncHandler(async (req, res) => {
 
 const deleteFAQ = asyncHandler(async (req, res) => {
     const { id } = req.query
-   
+
     const faqExist = await FAQ.findOne({ _id: id })
     if(!faqExist) {
         return res.status(400).send({ message: 'FAQ not exist' })

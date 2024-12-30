@@ -64,15 +64,16 @@ const deleteCategory = asyncHandler(async (req, res) => {
   
   const f1 = sub.image;
   
-  // if (f1) {
-  //   const fileName = f1.split("//")[1].split("/")[1];
+  if (f1) {
+    const fileName = f1.split("//")[1].split("/")[1];
 
-  //   const command = new DeleteObjectCommand({
-  //     Bucket: process.env.AWS_BUCKET,
-  //     Key: fileName,
-  //   });
-  //   const response = await s3.send(command);
-  // }
+    const command = new DeleteObjectCommand({
+      Bucket: process.env.AWS_BUCKET,
+      Key: fileName,
+    });
+    const response = await s3.send(command);
+   
+  }
 
   // await Product.deleteMany({category: req.query.id})
   const products = await Product.find({categoy: req.query.id})
@@ -83,10 +84,10 @@ const deleteCategory = asyncHandler(async (req, res) => {
   if(subcategories.length > 0) {
     return res.status(400).send({status: false, message: 'Delete SubCategories First'})
   }
-  const specialCategories = await SpecialCategory.find({category: req.query.id}) 
-  if(specialCategories.length > 0) {
-    return res.status(400).send({status: false, message: 'Delete Special Categories First'})
-  }
+  // const specialCategories = await SpecialCategory.find({category: req.query.id}) 
+  // if(specialCategories.length > 0) {
+  //   return res.status(400).send({status: false, message: 'Delete Special Categories First'})
+  // }
   await Category.deleteOne({ _id: req.query.id });
   res.json("deleted");
 });
@@ -157,15 +158,16 @@ const deleteSubCategory = asyncHandler(async (req, res) => {
 
   const f1 = sub.image;
 
-  // if (f1) {
-  //   const fileName = f1.split("//")[1].split("/")[1];
+  if (f1) {
+    const fileName = f1.split("//")[1].split("/")[1];
 
-  //   const command = new DeleteObjectCommand({
-  //     Bucket: process.env.AWS_BUCKET,
-  //     Key: fileName,
-  //   });
-  //   const response = await s3.send(command);
-  // }
+    const command = new DeleteObjectCommand({
+      Bucket: process.env.AWS_BUCKET,
+      Key: fileName,
+    });
+    const response = await s3.send(command);
+    
+  }
   //   await Product.deleteMany({subcategory: req.query.id})
 
   const products = await Product.find({subcategory: req.query.id})
@@ -173,10 +175,11 @@ const deleteSubCategory = asyncHandler(async (req, res) => {
     return res.status(400).send({status: false, message: "Delete all Products of this subcategory first"})
   }
 
-  const specialCategories = await SpecialCategory.find({subcategory: req.query.id}) 
-  if(specialCategories.length > 0) {
-    return res.status(400).send({status: false, message: 'Delete Special Categories First'})
-  }
+  // const specialCategories = await SpecialCategory.find({subcategory: req.query.id}) 
+  // if(specialCategories.length > 0) {
+  //   return res.status(400).send({status: false, message: 'Delete Special Categories First'})
+  // }
+
   await SubCategory.deleteOne({ _id: req.query.id });
   res.json("deleted");
 });
